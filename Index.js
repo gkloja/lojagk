@@ -8,7 +8,7 @@ app.use(express.urlencoded({ extended: true, limit: '20mb' }));
 app.use(express.json({ limit: '20mb' }));
 app.use(cookieParser());
 
-const BASE = "http://br2.bronxyshost.com:4009/lojagk";
+const BASE = "http://br2.bronxyshost.com:4009";
 const MASK = "https://lojagk.vercel.app";
 
 // ===== ROTA ESPECIAL PARA /alterar-foto =====
