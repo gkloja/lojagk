@@ -1,0 +1,1189 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Dôra Atelier · Galeria de Arte Têxtil</title>
+  
+  <meta name="description" content="Dôra Atelier: galeria virtual de bolsas artesanais da Amazônia.">
+  
+  <!-- Fontes e ícones -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600;700&family=Montserrat:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    :root {
+      --fio: #b38b6d;
+      --fio-escuro: #8b5e3c;
+      --tecido: #faf3ea;
+      --sombra: #2e2a27;
+      --ouro: #d4af37;
+      --folha: #2c5530;
+      --marmore: #f5efe8;
+      
+      --font-titulo: 'Cormorant Garamond', serif;
+      --font-corpo: 'Montserrat', sans-serif;
+      
+      --transition-orgânica: cubic-bezier(0.34, 1.56, 0.64, 1);
+      --transition-elegante: cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    body {
+      background-color: var(--tecido);
+      color: var(--sombra);
+      font-family: var(--font-corpo);
+      overflow-x: hidden;
+    }
+
+    /* Loading Screen */
+    #tear-loader {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: var(--tecido);
+      z-index: 10000;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      transition: opacity 1s ease, visibility 1s;
+    }
+
+    #tear-loader.hidden {
+      opacity: 0;
+      visibility: hidden;
+    }
+
+    .loader-content {
+      text-align: center;
+    }
+
+    .loader-logo {
+      width: 180px;
+      margin-bottom: 2rem;
+      animation: breathe 2s infinite;
+    }
+
+    .loader-logo img {
+      width: 100%;
+      height: auto;
+    }
+
+    .loader-text {
+      font-family: var(--font-titulo);
+      font-size: 1.2rem;
+      letter-spacing: 4px;
+      color: var(--fio);
+    }
+
+    @keyframes breathe {
+      0%, 100% { transform: scale(1); opacity: 0.8; }
+      50% { transform: scale(1.05); opacity: 1; }
+    }
+
+    /* Logo fixa */
+    .logo-fixed {
+      position: fixed;
+      top: 30px;
+      left: 30px;
+      width: 90px;
+      height: 90px;
+      z-index: 1000;
+      background: white;
+      border-radius: 50%;
+      padding: 15px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      border: 2px solid var(--fio);
+      transition: all 0.3s var(--transition-elegante);
+    }
+
+    .logo-fixed:hover {
+      transform: scale(1.05) rotate(5deg);
+    }
+
+    .logo-fixed img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    /* Hero Section */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+      padding: 20px;
+      background: linear-gradient(135deg, var(--tecido) 0%, #fff 100%);
+    }
+
+    .hero-logo {
+      width: 200px;
+      margin-bottom: 2rem;
+      opacity: 0;
+      animation: fadeUp 1s ease 0.3s forwards;
+    }
+
+    .hero h1 {
+      font-family: var(--font-titulo);
+      font-size: clamp(3rem, 10vw, 6rem);
+      font-weight: 300;
+      letter-spacing: 0.1em;
+      text-align: center;
+      opacity: 0;
+      animation: fadeUp 1s ease 0.6s forwards;
+    }
+
+    .hero h1 span {
+      display: block;
+      font-size: 0.3em;
+      letter-spacing: 0.5em;
+      margin-top: 1rem;
+      color: var(--fio);
+    }
+
+    .hero p {
+      font-size: 1.2rem;
+      font-weight: 300;
+      max-width: 600px;
+      text-align: center;
+      margin: 2rem 0;
+      opacity: 0;
+      animation: fadeUp 1s ease 0.9s forwards;
+    }
+
+    .hero-scroll {
+      position: absolute;
+      bottom: 40px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      color: var(--fio);
+      opacity: 0;
+      animation: fadeUp 1s ease 1.2s forwards, bounce 2s infinite 2s;
+    }
+
+    /* Curator's Note */
+    .curator-note {
+      max-width: 800px;
+      margin: 60px auto 40px;
+      padding: 40px;
+      background: white;
+      border-radius: 4px;
+      box-shadow: 0 20px 40px -20px rgba(0,0,0,0.1);
+      text-align: center;
+      position: relative;
+    }
+
+    .curator-note::before {
+      content: '"';
+      font-family: var(--font-titulo);
+      font-size: 6rem;
+      color: var(--fio);
+      opacity: 0.2;
+      position: absolute;
+      top: -20px;
+      left: 20px;
+    }
+
+    .curator-note p {
+      font-size: 1.3rem;
+      line-height: 1.8;
+      font-style: italic;
+      color: var(--sombra);
+    }
+
+    .curator-signature {
+      margin-top: 20px;
+      font-family: var(--font-titulo);
+      font-size: 1.5rem;
+      color: var(--fio);
+    }
+
+    /* Filter Bar - Estilo Galeria */
+    .filter-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      max-width: 1400px;
+      margin: 0 auto 40px;
+      padding: 0 20px;
+    }
+
+    .filter-group {
+      display: flex;
+      gap: 10px;
+      background: white;
+      padding: 5px;
+      border-radius: 40px;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+    }
+
+    .filter-btn {
+      padding: 12px 30px;
+      border: none;
+      background: transparent;
+      border-radius: 40px;
+      font-family: var(--font-corpo);
+      font-size: 0.9rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      color: var(--sombra);
+    }
+
+    .filter-btn.active {
+      background: var(--fio);
+      color: white;
+    }
+
+    .collection-stats {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--fio);
+    }
+
+    .stat-number {
+      font-size: 2rem;
+      font-weight: 300;
+      font-family: var(--font-titulo);
+      line-height: 1;
+    }
+
+    /* Galeria - Layout de Museu */
+    .gallery {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 20px 60px;
+    }
+
+    /* Coleção em Destaque */
+    .featured-collection {
+      margin-bottom: 60px;
+    }
+
+    .collection-header {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      margin-bottom: 30px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid rgba(179,139,109,0.3);
+    }
+
+    .collection-title {
+      font-family: var(--font-titulo);
+      font-size: 2rem;
+      font-weight: 400;
+      color: var(--fio-escuro);
+    }
+
+    .collection-count {
+      color: var(--fio);
+      font-size: 0.9rem;
+      letter-spacing: 1px;
+    }
+
+    .collection-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 30px;
+    }
+
+    /* Card de Peça - Estilo Galeria */
+    .art-piece {
+      cursor: pointer;
+      opacity: 0;
+      transform: translateY(30px);
+      transition: all 0.8s var(--transition-elegante);
+    }
+
+    .art-piece.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .art-piece:hover {
+      transform: translateY(-5px);
+    }
+
+    .art-frame {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 3/4;
+      background: white;
+      padding: 15px;
+      box-shadow: 0 10px 30px -10px rgba(0,0,0,0.1);
+      margin-bottom: 15px;
+      transition: box-shadow 0.4s;
+    }
+
+    .art-piece:hover .art-frame {
+      box-shadow: 0 20px 40px -10px rgba(179,139,109,0.3);
+    }
+
+    .art-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 1s;
+    }
+
+    .art-piece:hover .art-image {
+      transform: scale(1.02);
+    }
+
+    .art-badge {
+      position: absolute;
+      top: 25px;
+      right: 25px;
+      background: var(--fio);
+      color: white;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+      font-weight: 500;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+
+    .art-info {
+      padding: 0 10px;
+    }
+
+    .art-ref {
+      font-size: 0.8rem;
+      color: var(--fio);
+      letter-spacing: 2px;
+      margin-bottom: 5px;
+    }
+
+    .art-title {
+      font-family: var(--font-titulo);
+      font-size: 1.3rem;
+      font-weight: 500;
+      color: var(--sombra);
+    }
+
+    .art-category {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      color: var(--fio);
+      opacity: 0.7;
+      margin-top: 5px;
+    }
+
+    /* Seção de Peças Únicas */
+    .unique-section {
+      margin-top: 80px;
+    }
+
+    .unique-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 25px;
+    }
+
+    /* Modal - Exposição Individual */
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(250, 243, 234, 0.98);
+      z-index: 5000;
+      display: none;
+      opacity: 0;
+      transition: opacity 0.4s ease;
+      overflow-y: auto;
+    }
+
+    .modal.active {
+      display: block;
+      opacity: 1;
+    }
+
+    .modal-exhibition {
+      min-height: 100%;
+      display: grid;
+      grid-template-columns: 1.5fr 1fr;
+    }
+
+    .modal-gallery {
+      position: relative;
+      background: #222;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .modal-slider {
+      display: flex;
+      height: 100%;
+      transition: transform 0.6s var(--transition-elegante);
+    }
+
+    .modal-slide {
+      min-width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-slide img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+    }
+
+    .modal-controls {
+      position: absolute;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 15px;
+      z-index: 10;
+    }
+
+    .modal-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.3);
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .modal-dot.active {
+      background: var(--fio);
+      transform: scale(1.3);
+    }
+
+    .modal-arrow {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(255,255,255,0.2);
+      border: none;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      color: white;
+      font-size: 1.5rem;
+      cursor: pointer;
+      transition: all 0.3s;
+      backdrop-filter: blur(5px);
+      z-index: 10;
+    }
+
+    .modal-arrow:hover {
+      background: var(--fio);
+    }
+
+    .modal-arrow.prev { left: 20px; }
+    .modal-arrow.next { right: 20px; }
+
+    .modal-info {
+      padding: 60px 40px;
+      position: relative;
+      overflow-y: auto;
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 30px;
+      right: 30px;
+      width: 50px;
+      height: 50px;
+      border: none;
+      background: white;
+      border-radius: 50%;
+      font-size: 1.5rem;
+      cursor: pointer;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      transition: all 0.3s;
+      z-index: 20;
+    }
+
+    .modal-close:hover {
+      transform: rotate(90deg);
+      background: var(--fio);
+      color: white;
+    }
+
+    .modal-artist-statement {
+      margin-bottom: 40px;
+    }
+
+    .modal-artist-statement h3 {
+      font-family: var(--font-titulo);
+      font-size: 2rem;
+      font-weight: 400;
+      color: var(--fio-escuro);
+      margin-bottom: 20px;
+    }
+
+    .modal-description {
+      line-height: 1.8;
+      color: var(--sombra);
+      font-size: 1.1rem;
+    }
+
+    .modal-details {
+      margin: 40px 0;
+      padding: 30px 0;
+      border-top: 1px solid rgba(179,139,109,0.2);
+      border-bottom: 1px solid rgba(179,139,109,0.2);
+    }
+
+    .detail-item {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 15px;
+    }
+
+    .detail-label {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      color: var(--fio);
+      letter-spacing: 1px;
+    }
+
+    .detail-value {
+      font-weight: 500;
+    }
+
+    .btn-acquire {
+      background: var(--fio);
+      color: white;
+      text-decoration: none;
+      padding: 20px 40px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      font-weight: 500;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      transition: all 0.3s;
+      border: 1px solid transparent;
+    }
+
+    .btn-acquire:hover {
+      background: white;
+      color: var(--fio);
+      border-color: var(--fio);
+    }
+
+    /* Elementos flutuantes */
+    .sound-ambient {
+      position: fixed;
+      bottom: 30px;
+      left: 30px;
+      z-index: 2000;
+      display: flex;
+      gap: 15px;
+      align-items: center;
+    }
+
+    .sound-toggle {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: white;
+      border: 2px solid var(--fio);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s;
+      color: var(--fio);
+    }
+
+    .sound-toggle:hover {
+      background: var(--fio);
+      color: white;
+      transform: scale(1.1);
+    }
+
+    .wave-viz {
+      display: flex;
+      gap: 3px;
+      height: 30px;
+      align-items: flex-end;
+    }
+
+    .wave-viz span {
+      width: 4px;
+      background: var(--fio);
+      border-radius: 2px;
+      animation: wave 1.2s infinite;
+    }
+
+    .wave-viz span:nth-child(1) { height: 10px; animation-delay: 0s; }
+    .wave-viz span:nth-child(2) { height: 20px; animation-delay: 0.2s; }
+    .wave-viz span:nth-child(3) { height: 15px; animation-delay: 0.4s; }
+    .wave-viz span:nth-child(4) { height: 25px; animation-delay: 0.1s; }
+    .wave-viz span:nth-child(5) { height: 12px; animation-delay: 0.3s; }
+
+    @keyframes wave {
+      0%, 100% { transform: scaleY(0.5); }
+      50% { transform: scaleY(1.5); }
+    }
+
+    .wa-premium {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      width: 60px;
+      height: 60px;
+      background: #25D366;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 2rem;
+      text-decoration: none;
+      box-shadow: 0 10px 30px rgba(37,211,102,0.3);
+      transition: all 0.3s;
+      z-index: 2000;
+      border: 2px solid white;
+    }
+
+    .wa-premium:hover {
+      transform: scale(1.1) rotate(5deg);
+    }
+
+    footer {
+      text-align: center;
+      padding: 60px 20px;
+      background: var(--sombra);
+      color: var(--tecido);
+    }
+
+    footer a {
+      color: var(--fio);
+      text-decoration: none;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes bounce {
+      0%, 20%, 50%, 80%, 100% { transform: translateX(-50%) translateY(0); }
+      40% { transform: translateX(-50%) translateY(-10px); }
+      60% { transform: translateX(-50%) translateY(-5px); }
+    }
+
+    @media (max-width: 900px) {
+      .modal-exhibition {
+        grid-template-columns: 1fr;
+      }
+      
+      .modal-gallery {
+        height: 50vh;
+      }
+      
+      .modal-info {
+        padding: 40px 20px;
+      }
+      
+      .filter-bar {
+        flex-direction: column;
+        gap: 20px;
+      }
+      
+      .logo-fixed {
+        width: 60px;
+        height: 60px;
+        top: 15px;
+        left: 15px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Loader -->
+  <div id="tear-loader">
+    <div class="loader-content">
+      <div class="loader-logo">
+        <img src="InShot_20260213_221607139.png" alt="Dôra Atelier">
+      </div>
+      <div class="loader-text">Bordando histórias...</div>
+    </div>
+  </div>
+
+  <!-- Logo Fixa -->
+  <div class="logo-fixed">
+    <img src="InShot_20260213_221607139.png" alt="Dôra Atelier">
+  </div>
+
+  <!-- Hero -->
+  <section class="hero">
+    <img src="InShot_20260213_221607139.png" alt="Dôra Atelier" class="hero-logo">
+    <h1>
+      DÔRA
+      <span>ATELIER</span>
+    </h1>
+    <p>Galeria de arte têxtil · Manaus, Amazonas</p>
+    <div class="hero-scroll">
+      <i class="fas fa-chevron-down"></i>
+      <span>EXPLORAR COLEÇÃO</span>
+    </div>
+  </section>
+
+  <!-- Nota da Curadora -->
+  <div class="curator-note">
+    <p>Cada peça é uma narrativa tecida à mão, onde os fios carregam histórias da floresta e as cores refletem a alma amazônica.</p>
+    <div class="curator-signature">— Dôra</div>
+  </div>
+
+  <!-- Filtros -->
+  <div class="filter-bar">
+    <div class="filter-group">
+      <button class="filter-btn active" id="filterLatest">Em Exposição</button>
+      <button class="filter-btn" id="filterRandom">Curadoria Especial</button>
+    </div>
+    <div class="collection-stats">
+      <span class="stat-number" id="totalCount">0</span>
+      <span>peças na coleção</span>
+    </div>
+  </div>
+
+  <!-- Galeria -->
+  <div class="gallery" id="gallery"></div>
+
+  <!-- Modal -->
+  <div class="modal" id="modal">
+    <div class="modal-exhibition">
+      <div class="modal-gallery">
+        <div class="modal-slider" id="modalSlider"></div>
+        <button class="modal-arrow prev" id="prevSlide"><i class="fas fa-chevron-left"></i></button>
+        <button class="modal-arrow next" id="nextSlide"><i class="fas fa-chevron-right"></i></button>
+        <div class="modal-controls" id="modalDots"></div>
+      </div>
+      
+      <div class="modal-info">
+        <button class="modal-close" id="modalCloseBtn">&times;</button>
+        
+        <div class="modal-artist-statement">
+          <h3 id="modalTitle">Bolsa Artesanal</h3>
+          <p class="modal-description" id="modalDesc"></p>
+        </div>
+        
+        <div class="modal-details">
+          <div class="detail-item">
+            <span class="detail-label">Referência</span>
+            <span class="detail-value" id="modalRef"></span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Técnica</span>
+            <span class="detail-value">Bordado manual</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Origem</span>
+            <span class="detail-value">Manaus/AM</span>
+          </div>
+        </div>
+        
+        <a href="#" class="btn-acquire" id="modalWa" target="_blank">
+          <span>Solicitar aquisição</span>
+          <i class="fab fa-whatsapp"></i>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Controles de som -->
+  <div class="sound-ambient">
+    <div class="sound-toggle" id="radioBtn">
+      <i class="fas fa-play" id="radioIcon"></i>
+    </div>
+    <div class="wave-viz" id="visualizer">
+      <span></span><span></span><span></span><span></span><span></span>
+    </div>
+  </div>
+
+  <!-- WhatsApp -->
+  <a href="https://wa.me/559292055895" class="wa-premium" target="_blank">
+    <i class="fab fa-whatsapp"></i>
+  </a>
+
+  <footer>
+    <p>© 2026 Dôra Atelier · Manaus, Amazonas</p>
+    <p style="margin-top: 10px;">@dora.atelier · <a href="#">Política de aquisição</a></p>
+  </footer>
+
+  <script>
+    // Sons
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    let audioCtx = null;
+
+    function playClickSound() {
+      if (!audioCtx) {
+        audioCtx = new AudioContext();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'sine';
+      osc.frequency.value = 600;
+      gain.gain.value = 0.1;
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start();
+      osc.stop(audioCtx.currentTime + 0.05);
+    }
+
+    // Ativar áudio na primeira interação
+    document.body.addEventListener('click', () => {
+      if (!audioCtx) {
+        audioCtx = new AudioContext();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }, { once: true });
+
+    // Rádio
+    const radioBtn = document.getElementById('radioBtn');
+    const radioIcon = document.getElementById('radioIcon');
+    const visualizer = document.getElementById('visualizer');
+    let radioPlaying = false;
+    let audioElement = null;
+
+    radioBtn.addEventListener('click', () => {
+      playClickSound();
+      if (!radioPlaying) {
+        if (!audioElement) {
+          audioElement = new Audio('https://stream.radiojar.com/4ywdgup3bnzuv');
+          audioElement.volume = 0.3;
+        }
+        audioElement.play().then(() => {
+          radioPlaying = true;
+          radioIcon.className = 'fas fa-pause';
+          visualizer.style.opacity = '1';
+        }).catch(() => {
+          radioPlaying = true;
+          radioIcon.className = 'fas fa-pause';
+          visualizer.style.opacity = '1';
+        });
+      } else {
+        if (audioElement) audioElement.pause();
+        radioPlaying = false;
+        radioIcon.className = 'fas fa-play';
+        visualizer.style.opacity = '0.3';
+      }
+    });
+
+    visualizer.style.opacity = '0.3';
+
+    // Dados
+    const TOTAL_IMAGENS = 114;
+    const rawGroups = [
+      [1, 2, 3, 53], [24, 25, 26], [56, 57, 58], [76, 83],
+      [87, 88, 89], [86, 90, 91], [105, 106, 111], [108, 109, 101, 114],
+      [10, 31, 64], [103, 107], [22, 37, 72], [34, 49, 59, 67], [100, 95]
+    ];
+
+    const descricoes = [
+      "Inspirada nas tramas amazônicas, esta peça carrega a textura da floresta em cada detalhe.",
+      "A linha encontra a tradição neste design contemporâneo. Uma homenagem às artesãs do Rio Negro.",
+      "Feita com algodão natural tingido com jenipapo. A terra se revela em cada fio.",
+      "Técnica ancestral de bordado que leva dias para ser concluída. Exclusividade e arte.",
+      "O ouro do buriti encontra a delicadeza do crochê. Uma peça para durar gerações.",
+      "Desenho autoral que remete às ondas do encontro das águas. Leveza e movimento."
+    ];
+
+    let catalogo = [];
+    const processedIds = new Set();
+
+    rawGroups.forEach(group => {
+      const mainId = group[0];
+      const images = group.map(id => `imagens/${id.toString().padStart(3, '0')}.jpg`);
+      catalogo.push({
+        id: mainId,
+        displayId: mainId.toString().padStart(3, '0'),
+        images: images,
+        isGroup: true,
+        desc: descricoes[Math.floor(Math.random() * descricoes.length)]
+      });
+      group.forEach(id => processedIds.add(id));
+    });
+
+    for (let i = 1; i <= TOTAL_IMAGENS; i++) {
+      if (!processedIds.has(i)) {
+        catalogo.push({
+          id: i,
+          displayId: i.toString().padStart(3, '0'),
+          images: [`imagens/${i.toString().padStart(3, '0')}.jpg`],
+          isGroup: false,
+          desc: descricoes[Math.floor(Math.random() * descricoes.length)]
+        });
+      }
+    }
+
+    catalogo.sort((a, b) => a.id - b.id);
+
+    // Renderizar galeria
+    const gallery = document.getElementById('gallery');
+    const totalCount = document.getElementById('totalCount');
+
+    function renderGallery(items) {
+      totalCount.textContent = items.length;
+      
+      // Separar grupos (múltiplas fotos) e individuais
+      const groups = items.filter(item => item.isGroup);
+      const singles = items.filter(item => !item.isGroup);
+      
+      let html = '';
+
+      // Seção de Coleções (grupos)
+      if (groups.length > 0) {
+        html += `
+          <div class="featured-collection">
+            <div class="collection-header">
+              <h2 class="collection-title">Coleções Exclusivas</h2>
+              <span class="collection-count">${groups.length} conjuntos</span>
+            </div>
+            <div class="collection-grid">
+        `;
+        
+        groups.forEach((item, index) => {
+          html += `
+            <div class="art-piece" data-id="${item.id}" style="transition-delay: ${index * 50}ms">
+              <div class="art-frame">
+                <img src="${item.images[0]}" alt="Peça Dôra" class="art-image" loading="lazy">
+                <div class="art-badge">${item.images.length}</div>
+              </div>
+              <div class="art-info">
+                <div class="art-ref">REF ${item.displayId}</div>
+                <div class="art-title">Coleção Amazônia</div>
+                <div class="art-category">${item.images.length} ângulos</div>
+              </div>
+            </div>
+          `;
+        });
+        
+        html += `
+            </div>
+          </div>
+        `;
+      }
+
+      // Seção de Peças Únicas
+      if (singles.length > 0) {
+        html += `
+          <div class="unique-section">
+            <div class="collection-header">
+              <h2 class="collection-title">Peças Únicas</h2>
+              <span class="collection-count">${singles.length} disponíveis</span>
+            </div>
+            <div class="unique-grid">
+        `;
+        
+        singles.forEach((item, index) => {
+          html += `
+            <div class="art-piece" data-id="${item.id}" style="transition-delay: ${index * 30}ms">
+              <div class="art-frame">
+                <img src="${item.images[0]}" alt="Peça Dôra" class="art-image" loading="lazy">
+              </div>
+              <div class="art-info">
+                <div class="art-ref">REF ${item.displayId}</div>
+                <div class="art-title">Bolsa Artesanal</div>
+                <div class="art-category">peça exclusiva</div>
+              </div>
+            </div>
+          `;
+        });
+        
+        html += `
+            </div>
+          </div>
+        `;
+      }
+
+      gallery.innerHTML = html;
+
+      // Adicionar eventos aos cards
+      document.querySelectorAll('.art-piece').forEach(card => {
+        const id = parseInt(card.dataset.id);
+        const item = catalogo.find(i => i.id === id);
+        
+        card.addEventListener('click', () => {
+          playClickSound();
+          openModal(item);
+        });
+
+        // Observer para animação
+        observer.observe(card);
+      });
+    }
+
+    // Observer
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, { threshold: 0.1 });
+
+    // Modal
+    const modal = document.getElementById('modal');
+    const modalSlider = document.getElementById('modalSlider');
+    const modalDots = document.getElementById('modalDots');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalDesc = document.getElementById('modalDesc');
+    const modalRef = document.getElementById('modalRef');
+    const modalWa = document.getElementById('modalWa');
+    const modalCloseBtn = document.getElementById('modalCloseBtn');
+    const prevSlide = document.getElementById('prevSlide');
+    const nextSlide = document.getElementById('nextSlide');
+
+    let currentItem = null;
+    let currentSlide = 0;
+    let touchStartX = 0;
+
+    function openModal(item) {
+      currentItem = item;
+      currentSlide = 0;
+      
+      modalTitle.textContent = item.isGroup ? 'Coleção Exclusiva' : 'Bolsa Artesanal';
+      modalDesc.textContent = item.desc;
+      modalRef.textContent = item.displayId;
+      
+      updateWaLink(0);
+      
+      // Construir slides
+      modalSlider.innerHTML = '';
+      modalDots.innerHTML = '';
+      
+      item.images.forEach((src, idx) => {
+        const slide = document.createElement('div');
+        slide.className = 'modal-slide';
+        slide.innerHTML = `<img src="${src}" alt="Detalhe da peça">`;
+        modalSlider.appendChild(slide);
+        
+        if (item.images.length > 1) {
+          const dot = document.createElement('div');
+          dot.className = `modal-dot ${idx === 0 ? 'active' : ''}`;
+          dot.addEventListener('click', () => goToSlide(idx));
+          modalDots.appendChild(dot);
+        }
+      });
+      
+      modal.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function updateWaLink(slideIndex) {
+      if (!currentItem) return;
+      const imageUrl = `https://atelierdora.onrender.com/${currentItem.images[slideIndex]}`;
+      const msg = `Olá Dôra! Me interessei por esta peça (${imageUrl}) da sua coleção. Gostaria de mais informações.`;
+      modalWa.href = `https://wa.me/559292055895?text=${encodeURIComponent(msg)}`;
+    }
+
+    function goToSlide(index) {
+      if (!currentItem) return;
+      if (index < 0) index = currentItem.images.length - 1;
+      if (index >= currentItem.images.length) index = 0;
+      
+      currentSlide = index;
+      modalSlider.style.transform = `translateX(-${index * 100}%)`;
+      
+      const dots = document.querySelectorAll('.modal-dot');
+      dots.forEach((dot, i) => {
+        if (i === index) dot.classList.add('active');
+        else dot.classList.remove('active');
+      });
+      
+      updateWaLink(index);
+    }
+
+    prevSlide.addEventListener('click', () => goToSlide(currentSlide - 1));
+    nextSlide.addEventListener('click', () => goToSlide(currentSlide + 1));
+
+    // Touch events
+    modalSlider.addEventListener('touchstart', (e) => {
+      touchStartX = e.touches[0].clientX;
+    });
+
+    modalSlider.addEventListener('touchend', (e) => {
+      if (!touchStartX) return;
+      const diff = e.changedTouches[0].clientX - touchStartX;
+      if (Math.abs(diff) > 50) {
+        if (diff > 0) goToSlide(currentSlide - 1);
+        else goToSlide(currentSlide + 1);
+      }
+      touchStartX = 0;
+    });
+
+    // Fechar modal
+    modalCloseBtn.addEventListener('click', closeModal);
+    
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeModal();
+    });
+
+    function closeModal() {
+      modal.classList.remove('active');
+      document.body.style.overflow = '';
+    }
+
+    // Filtros
+    document.getElementById('filterLatest').addEventListener('click', function() {
+      playClickSound();
+      document.getElementById('filterRandom').classList.remove('active');
+      this.classList.add('active');
+      renderGallery(catalogo);
+    });
+
+    document.getElementById('filterRandom').addEventListener('click', function() {
+      playClickSound();
+      document.getElementById('filterLatest').classList.remove('active');
+      this.classList.add('active');
+      const shuffled = [...catalogo].sort(() => 0.5 - Math.random());
+      renderGallery(shuffled);
+    });
+
+    // Loading
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        document.getElementById('tear-loader').classList.add('hidden');
+        renderGallery(catalogo);
+      }, 2000);
+    });
+  </script>
+</body>
+</html>
