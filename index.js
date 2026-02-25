@@ -1,4 +1,4 @@
-   import express from "express";
+      import express from "express";
 import fetch from "node-fetch";
 import cookieParser from "cookie-parser";
 
@@ -10,6 +10,32 @@ app.use(cookieParser());
 
 const BASE = "http://br2.bronxyshost.com:4009/lojagk";
 const MASK = "https://lojagk.vercel.app";
+
+// Rota para capturar arquivos da raiz (como imagens)
+app.get('/:file', async (req, res, next) => {
+    // Se não tiver extensão (ponto), passa pro proxy geral
+    if (!req.params.file.includes('.')) {
+        return next();
+    }
+
+    try {
+        // Tenta buscar o arquivo na raiz do servidor original
+        const fileUrl = `http://br2.bronxyshost.com:4009/${req.params.file}`;
+        const response = await fetch(fileUrl, {
+            headers: { "origin": BASE, "referer": BASE + "/" }
+        });
+
+        if (response.ok) {
+            const type = response.headers.get("content-type") || "";
+            res.setHeader("Content-Type", type);
+            const arrayBuffer = await response.arrayBuffer();
+            return res.send(Buffer.from(arrayBuffer));
+        }
+    } catch (e) {
+        console.error("Erro ao buscar arquivo estático", e);
+    }
+    next();
+});
 
 app.all('*', async (req, res) => {
   try {
@@ -69,18 +95,24 @@ app.all('*', async (req, res) => {
     const responseType = response.headers.get("content-type") || "";
     if (responseType) res.setHeader("Content-Type", responseType);
 
-    // 🔥 A MÁGICA DAS IMAGENS ACONTECE AQUI 🔥
-    // Se o backend estiver mandando Texto, HTML ou JSON (onde ficam os links das imagens)
     if (responseType.includes("text/") || responseType.includes("application/json") || responseType.includes("application/javascript")) {
       let textContent = await response.text();
       
-      // Troca todas as menções do servidor inseguro pela máscara segura
+      // 1. Troca URLs absolutas inseguras
       textContent = textContent.replace(/http:\/\/br2\.bronxyshost\.com:4009\/lojagk/g, MASK);
       textContent = textContent.replace(/http:\/\/br2\.bronxyshost\.com:4009/g, MASK);
       
+      // 2. 🔥 A MÁGICA: Corrige caminhos relativos em tags de imagem, links e scripts
+      textContent = textContent.replace(/src="\//g, `src="${MASK}/`);
+      textContent = textContent.replace(/href="\//g, `href="${MASK}/`);
+      
+      // 3. Adiciona a tag <base> para forçar links relativos a usarem a máscara
+      if(textContent.includes('<head>')) {
+          textContent = textContent.replace('<head>', `<head>\n<base href="${MASK}/">`);
+      }
+
       res.send(textContent);
     } else {
-      // Se for o arquivo da imagem em si (binário), apenas repassa normalmente
       const arrayBuffer = await response.arrayBuffer();
       res.send(Buffer.from(arrayBuffer));
     }
@@ -91,10 +123,10 @@ app.all('*', async (req, res) => {
   }
 });
 
-// Exportação obrigatória para o Vercel rodar o Node.js
 if (process.env.NODE_ENV !== 'production') {
   const PORT = process.env.PORT || 3000;
   app.listen(PORT, () => console.log(`🚀 Máscara rodando na porta ${PORT}`));
 }
 
 export default app;
+       
