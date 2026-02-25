@@ -891,12 +891,20 @@ app.use(async (req, res) => {
   }
 });
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`
-  🚀 Máscara rodando na porta ${PORT}
-  🔗 Encaminhando para: ${BASE}
-  🎭 URL da máscara: ${MASK}
-  ✅ Uploads vão direto para o backend original!
-  `);
-});
+// ====== FINAL DO ARQUIVO ======
+
+// Rodar localmente no seu PC
+if (process.env.NODE_ENV !== 'production') {
+  const PORT = process.env.PORT || 3000;
+  app.listen(PORT, () => {
+    console.log(`
+    🚀 Máscara rodando na porta ${PORT}
+    🔗 Encaminhando para: ${BASE}
+    🎭 URL da máscara: ${MASK}
+    ✅ Uploads vão direto para o backend original!
+    `);
+  });
+}
+
+// Exportar para o Vercel (Como você usa 'import', tem que ser 'export default')
+export default app;
