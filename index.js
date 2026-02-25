@@ -1,4 +1,4 @@
-      import express from "express";
+import express from "express";
 import fetch from "node-fetch";
 import cookieParser from "cookie-parser";
 
@@ -8,45 +8,27 @@ app.use(express.urlencoded({ extended: true, limit: '20mb' }));
 app.use(express.json({ limit: '20mb' }));
 app.use(cookieParser());
 
+// Separamos em duas variáveis: O servidor puro e a pasta da loja
+const ROOT_SERVER = "http://br2.bronxyshost.com:4009";
 const BASE = "http://br2.bronxyshost.com:4009/lojagk";
 const MASK = "https://lojagk.vercel.app";
 
-// Rota para capturar arquivos da raiz (como imagens)
-app.get('/:file', async (req, res, next) => {
-    // Se não tiver extensão (ponto), passa pro proxy geral
-    if (!req.params.file.includes('.')) {
-        return next();
-    }
-
-    try {
-        // Tenta buscar o arquivo na raiz do servidor original
-        const fileUrl = `http://br2.bronxyshost.com:4009/${req.params.file}`;
-        const response = await fetch(fileUrl, {
-            headers: { "origin": BASE, "referer": BASE + "/" }
-        });
-
-        if (response.ok) {
-            const type = response.headers.get("content-type") || "";
-            res.setHeader("Content-Type", type);
-            const arrayBuffer = await response.arrayBuffer();
-            return res.send(Buffer.from(arrayBuffer));
-        }
-    } catch (e) {
-        console.error("Erro ao buscar arquivo estático", e);
-    }
-    next();
-});
-
 app.all('*', async (req, res) => {
   try {
-    const targetUrl = BASE + req.url;
-    console.log(`🔗 Proxy: ${req.method} ${req.path}`);
+    // 1. O DESVIO INTELIGENTE
+    // Verifica se a requisição termina com extensão de arquivo de imagem, css, script, etc.
+    const isFile = /\.(jpg|jpeg|png|gif|webp|svg|ico|css|js)$/i.test(req.path);
+    
+    // Se for arquivo, pega do servidor puro (ROOT_SERVER). Se for página, pega da loja (BASE)
+    const targetUrl = isFile ? ROOT_SERVER + req.url : BASE + req.url;
+    
+    console.log(`🔗 Proxy [${isFile ? 'ARQUIVO' : 'PÁGINA'}]: ${req.method} ${req.path} ---> ${targetUrl}`);
 
     const headers = { 
       ...req.headers,
-      "host": new URL(BASE).host,
-      "origin": BASE,
-      "referer": BASE + "/",
+      "host": new URL(ROOT_SERVER).host,
+      "origin": ROOT_SERVER,
+      "referer": ROOT_SERVER + "/",
       "x-forwarded-for": req.ip
     };
     delete headers["content-length"];
@@ -98,21 +80,13 @@ app.all('*', async (req, res) => {
     if (responseType.includes("text/") || responseType.includes("application/json") || responseType.includes("application/javascript")) {
       let textContent = await response.text();
       
-      // 1. Troca URLs absolutas inseguras
+      // Apenas trocamos os links absolutos que o backend enviar de volta, para manter tudo no Vercel
       textContent = textContent.replace(/http:\/\/br2\.bronxyshost\.com:4009\/lojagk/g, MASK);
       textContent = textContent.replace(/http:\/\/br2\.bronxyshost\.com:4009/g, MASK);
-      
-      // 2. 🔥 A MÁGICA: Corrige caminhos relativos em tags de imagem, links e scripts
-      textContent = textContent.replace(/src="\//g, `src="${MASK}/`);
-      textContent = textContent.replace(/href="\//g, `href="${MASK}/`);
-      
-      // 3. Adiciona a tag <base> para forçar links relativos a usarem a máscara
-      if(textContent.includes('<head>')) {
-          textContent = textContent.replace('<head>', `<head>\n<base href="${MASK}/">`);
-      }
 
       res.send(textContent);
     } else {
+      // Aqui as imagens passam em formato binário diretamente pro navegador!
       const arrayBuffer = await response.arrayBuffer();
       res.send(Buffer.from(arrayBuffer));
     }
@@ -129,4 +103,6 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 export default app;
-       
+
+
+    
