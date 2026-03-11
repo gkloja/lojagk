@@ -1,108 +1,2575 @@
-import express from "express";
-import fetch from "node-fetch";
-import cookieParser from "cookie-parser";
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head> 
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Loja GK Premium - maquiaGem e Kosmeticos exclusivos com promoções incríveis.">
+<meta name="keywords" content="Loja GK, cosméticos, produtos premium, promoções, Manaus, maquiaGem, Kosmeticos, Gabriel e Kalena">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://loja-gk.onrender.com/">
+<title>Loja GK - MaquiaGem e Kosmeticos</title>
 
-const app = express();
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="/IMG-20251107-WA1870.jpg" />
+  
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Playfair+Display:wght=400;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-app.use(express.urlencoded({ extended: true, limit: '20mb' }));
-app.use(express.json({ limit: '20mb' }));
-app.use(cookieParser());
-
-// Separamos em duas variáveis: O servidor puro e a pasta da loja
-const ROOT_SERVER = "http://br2.bronxyshost.com:4009";
-const BASE = "http://br2.bronxyshost.com:4009/lojagk";
-const MASK = "https://lojagk.vercel.app";
-
-app.all('*', async (req, res) => {
-  try {
-    // 1. O DESVIO INTELIGENTE
-    // Verifica se a requisição termina com extensão de arquivo de imagem, css, script, etc.
-    const isFile = /\.(jpg|jpeg|png|gif|webp|svg|ico|css|js)$/i.test(req.path);
+ <style>
+  /* ====================== DESIGN SYSTEM ATUALIZADO ====================== */
+  :root {
+    /* Cores principais refinadas */
+    --cor-primaria: #1c1c1c;
+    --cor-secundaria: #f8f5f0; /* Bege mais claro e elegante */
+    --cor-acento: #b89f5a; /* Dourado mais rico e sofisticado */
+    --cor-acento-claro: #d4c29a;
+    --cor-fundo: #ffffff;
+    --cor-texto: #2d2d2d;
+    --cor-texto-claro: #ffffff;
+    --cor-sucesso: #27ae60; /* Verde mais elegante */
+    --cor-erro: #c0392b; /* Vermelho mais suave */
+    --cor-alerta: #e67e22;
+    --cor-borda-clara: #e8e8e8;
+    --cor-hover-lista: #f9f9f9;
     
-    // Se for arquivo, pega do servidor puro (ROOT_SERVER). Se for página, pega da loja (BASE)
-    const targetUrl = isFile ? ROOT_SERVER + req.url : BASE + req.url;
+    /* Sistema de sombras refinado */
+    --sombra-leve: 0 2px 8px rgba(0, 0, 0, 0.06);
+    --sombra-media: 0 4px 16px rgba(0, 0, 0, 0.1);
+    --sombra-intensa: 0 8px 30px rgba(0, 0, 0, 0.15);
+    --sombra-destaque: 0 0 0 4px rgba(184, 159, 90, 0.2);
     
-    console.log(`🔗 Proxy [${isFile ? 'ARQUIVO' : 'PÁGINA'}]: ${req.method} ${req.path} ---> ${targetUrl}`);
+    /* Transições e animações */
+    --transicao: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    --transicao-rapida: all 0.15s ease-out;
+    --transicao-lenta: all 0.5s cubic-bezier(0.22, 0.61, 0.36, 1);
+    
+    /* Bordas e espaçamentos */
+    --borda-raio: 12px;
+    --borda-raio-pequeno: 6px;
+    --espacamento-xs: 8px;
+    --espacamento-sm: 16px;
+    --espacamento-md: 24px;
+    --espacamento-lg: 32px;
+    --espacamento-xl: 48px;
+  }
 
-    const headers = { 
-      ...req.headers,
-      "host": new URL(ROOT_SERVER).host,
-      "origin": ROOT_SERVER,
-      "referer": ROOT_SERVER + "/",
-      "x-forwarded-for": req.ip
-    };
-    delete headers["content-length"];
+  /* ====================== BASE REFINADA ====================== */
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
 
-    let bodyInfo = undefined;
-    if (req.method !== "GET" && req.method !== "HEAD") {
-      const contentType = req.headers["content-type"] || "";
-      if (contentType.includes("application/json")) {
-        bodyInfo = JSON.stringify(req.body);
-        headers["Content-Type"] = "application/json";
-      } else if (contentType.includes("multipart/form-data")) {
-        bodyInfo = req;
-        delete headers["content-type"]; 
-      } else {
-        bodyInfo = new URLSearchParams(req.body).toString();
-        headers["Content-Type"] = "application/x-www-form-urlencoded;charset=UTF-8";
-      }
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    font-family: 'Inter', 'Roboto', sans-serif;
+    background-color: var(--cor-secundaria);
+    color: var(--cor-texto);
+    line-height: 1.6;
+    padding-top: 80px;
+    overflow-x: hidden;
+  }
+
+  /* ====================== TIPOGRAFIA REFINADA ====================== */
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 0.5em;
+  }
+
+  h1 {
+    font-size: 2.5rem;
+    letter-spacing: -0.5px;
+  }
+
+  h2 {
+    font-size: 2rem;
+    letter-spacing: -0.3px;
+  }
+
+  h3 {
+    font-size: 1.5rem;
+    letter-spacing: -0.2px;
+  }
+
+  p {
+    margin-bottom: 1em;
+  }
+
+  /* ====================== HEADER ELEGANTE ATUALIZADO ====================== */
+  .header-elegante {
+    background: linear-gradient(135deg, var(--cor-primaria) 0%, #2a2a2a 100%);
+    color: var(--cor-texto-claro);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 15px 20px;
+    box-shadow: var(--sombra-intensa);
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+
+  .logo-min {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    margin-right: 15px;
+    border: 2px solid var(--cor-acento);
+    object-fit: cover;
+    transition: var(--transicao);
+  }
+
+  .logo-min:hover {
+    transform: rotate(10deg) scale(1.05);
+    box-shadow: 0 0 15px rgba(184, 159, 90, 0.5);
+  }
+
+  .header-texto h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.8rem;
+    font-weight: 900;
+    letter-spacing: 2px;
+    color: var(--cor-acento);
+    margin: 0;
+    position: relative;
+    display: inline-block;
+  }
+
+  .header-texto h1::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--cor-acento), transparent);
+    transform: scaleX(0);
+    transition: transform 0.5s ease;
+  }
+
+  .header-texto:hover h1::after {
+    transform: scaleX(1);
+  }
+
+  .header-texto p {
+    font-size: 0.8rem;
+    font-weight: 300;
+    opacity: 0.8;
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+  }
+  /* ============================
+   GRID PREMIUM
+============================ */
+.grid-premium {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 22px;
+  padding: 20px;
+}
+
+
+/* ============================
+   CARD PREMIUM BASE
+============================ */
+.card-premium {
+  background: #ffffff;
+  border-radius: 18px;
+  padding: 16px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 8px 26px rgba(0,0,0,0.08);
+  transition: all 0.25s ease;
+  border: 1px solid transparent;
+}
+
+.card-premium:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 32px rgba(0,0,0,0.15);
+  border-color: #f1c27d;
+}
+
+
+/* ============================
+   SELO DINÂMICO
+============================ */
+.tag-dinamica {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  background: linear-gradient(45deg, #ffb800, #ff7600);
+  padding: 6px 12px;
+  font-size: 0.75rem;
+  font-weight: bold;
+  color: #fff;
+  border-radius: 10px;
+  z-index: 5;
+  animation: pulseTag 1.5s infinite;
+}
+
+@keyframes pulseTag {
+  0% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.12); opacity: .85; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+
+/* ============================
+   IMAGENS PREMIUM
+============================ */
+.premium-img {
+  width: 100%;
+  height: 260px;
+  border-radius: 14px;
+  overflow: hidden;
+  margin-bottom: 12px;
+  background: #eee;
+}
+
+.premium-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform .35s ease;
+}
+
+.card-premium:hover .premium-img img {
+  transform: scale(1.08);
+}
+
+
+/* ============================
+   TÍTULOS & TEXTOS
+============================ */
+.titulo-produto {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 8px;
+  min-height: 42px;
+}
+
+.preco-produto {
+  font-size: 1.2rem;
+  color: #111;
+  margin-bottom: 10px;
+}
+
+.preco-produto span {
+  font-size: 0.9rem;
+  opacity: 0.7;
+}
+
+.preco-produto strong {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #e49522;
+}
+
+
+/* ============================
+   AVALIAÇÃO
+============================ */
+.avaliacao-luxo {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 8px;
+  color: #666;
+  font-size: 0.85rem;
+}
+
+.avaliacao-luxo .stars i {
+  color: #f4c300;
+  margin-right: 1px;
+}
+
+
+/* ============================
+   ESTOQUE
+============================ */
+.estoque-premium {
+  font-size: 0.85rem;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #333;
+}
+
+.estoque-premium .zero {
+  color: #cc0000;
+  font-weight: bold;
+}
+
+
+/* ============================
+   BARRA DE POPULARIDADE
+============================ */
+.popularidade-bar {
+  width: 100%;
+  height: 6px;
+  background: #eaeaea;
+  border-radius: 10px;
+  overflow: hidden;
+  margin: 6px 0 4px;
+}
+
+.popularidade-bar .bar {
+  height: 100%;
+  background: linear-gradient(90deg, #ffb300, #ff7300);
+  border-radius: 10px;
+  transition: width .5s ease;
+}
+
+.popularidade-texto {
+  font-size: 0.78rem;
+  color: #555;
+  margin-bottom: 16px;
+}
+
+
+/* ============================
+   AÇÕES (BOTÕES)
+============================ */
+.acoes-premium {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.acoes-premium input {
+  width: 60px;
+  height: 38px;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  padding-left: 10px;
+  font-size: 0.9rem;
+}
+
+.btn-add-premium {
+  flex: 1;
+  background: linear-gradient(45deg, #ff9d00, #ff6c00);
+  color: white;
+  border: none;
+  padding: 10px 12px;
+  border-radius: 12px;
+  font-weight: bold;
+  cursor: pointer;
+  font-size: 0.95rem;
+  box-shadow: 0 4px 14px rgba(255, 110, 0, .35);
+  transition: all .2s ease;
+}
+
+.btn-add-premium:hover {
+  filter: brightness(1.1);
+  transform: translateY(-2px);
+}
+
+
+/* ============================
+   BOTÃO ESGOTADO
+============================ */
+.btn-esgotado-premium {
+  width: 100%;
+  background: #333;
+  color: #fff;
+  padding: 12px;
+  border-radius: 12px;
+  border: none;
+  font-size: 0.9rem;
+  cursor: pointer;
+  margin-top: 10px;
+  transition: background .2s ease;
+}
+
+.btn-esgotado-premium:hover {
+  background: #000;
+}
+
+  /* ====================== BANNER PROMOCIONAL ATUALIZADO ====================== */
+  .banner-promocao {
+    background: linear-gradient(90deg, var(--cor-acento) 0%, var(--cor-acento-claro) 100%);
+    color: var(--cor-texto-claro);
+    text-align: center;
+    padding: 12px 0;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .banner-promocao::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    animation: brilho 3s infinite;
+  }
+
+  @keyframes brilho {
+    0% { left: -100%; }
+    100% { left: 100%; }
+  }
+
+  /* ====================== LAYOUT PRINCIPAL REFINADO ====================== */
+  .container {
+    max-width: 1200px;
+    margin: 30px auto;
+    padding: 0 var(--espacamento-sm);
+  }
+
+  /* -------------------------------------------
+   DESIGN SYSTEM PREMIUM
+------------------------------------------- */
+:root {
+  --preto: #111;
+  --preto-suave: #1c1c1c;
+  --cinza-suave: #e9e9e9;
+  --cinza-medio: #cccccc;
+  --cinza-escuro: #3a3a3a;
+
+  --dourado: #c7a155;
+  --dourado-suave: #e7c98f;
+  --dourado-brilhante: #f5d389;
+
+  --verde-wpp: #25d366;
+  --vermelho: #d9534f;
+
+  --radius: 14px;
+  --shadow: 0 6px 18px rgba(0,0,0,0.18);
+  --shadow-hover: 0 10px 25px rgba(0,0,0,0.25);
+}
+ /* ====================== CONTROLES MODERNIZADOS ====================== */
+  .controles-produtos {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--espacamento-sm);
+    margin-bottom: var(--espacamento-lg);
+    background: var(--cor-fundo);
+    padding: var(--espacamento-md);
+    border-radius: var(--borda-raio);
+    box-shadow: var(--sombra-leve);
+    border: 1px solid var(--cor-borda-clara);
+  }
+
+  .pesquisa-container {
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+    border: 1px solid var(--cor-borda-clara);
+    border-radius: var(--borda-raio);
+    padding: var(--espacamento-xs) var(--espacamento-sm);
+    transition: var(--transicao);
+    min-width: 200px;
+    background: var(--cor-fundo);
+    position: relative;
+  }
+
+  .pesquisa-container:focus-within {
+    border-color: var(--cor-acento);
+    box-shadow: var(--sombra-destaque);
+  }
+
+  #pesquisa {
+    border: none;
+    outline: none;
+    padding: var(--espacamento-xs);
+    font-size: 1rem;
+    flex-grow: 1;
+    background: transparent;
+  }
+
+  .pesquisa-container i {
+    color: #999;
+    margin-right: var(--espacamento-xs);
+  }
+
+  .filtros-container {
+    display: flex;
+    gap: var(--espacamento-xs);
+    flex-wrap: wrap;
+  }
+
+  .filtro-btn {
+    background-color: var(--cor-fundo);
+    color: var(--cor-texto);
+    border: 1px solid var(--cor-borda-clara);
+    padding: var(--espacamento-xs) var(--espacamento-sm);
+    border-radius: var(--borda-raio);
+    cursor: pointer;
+    font-weight: 500;
+    transition: var(--transicao);
+    display: flex;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .filtro-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(184, 159, 90, 0.1), transparent);
+    transition: left 0.5s;
+  }
+
+  .filtro-btn:hover::before {
+    left: 100%;
+  }
+
+  .filtro-btn.ativo, .filtro-btn:hover {
+    background-color: var(--cor-acento);
+    color: var(--cor-texto-claro);
+    border-color: var(--cor-acento);
+    transform: translateY(-2px);
+    box-shadow: var(--sombra-media);
+  }
+
+  .filtro-btn i {
+    margin-right: 5px;
+  }
+
+  /* ====================== PRODUTOS GRID ATUALIZADO ====================== */
+  .produtos {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: var(--espacamento-lg);
+  }
+
+  .produto {
+    background: var(--cor-fundo);
+    border-radius: var(--borda-raio);
+    overflow: hidden;
+    box-shadow: var(--sombra-leve);
+    padding: var(--espacamento-md);
+    display: flex;
+    flex-direction: column;
+    transition: var(--transicao);
+    position: relative;
+    text-align: center;
+    border: 1px solid var(--cor-borda-clara);
+  }
+
+  .produto:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--sombra-intensa);
+    border-color: var(--cor-acento-claro);
+  }
+
+  .produto-img-container {
+    height: 250px;
+    width: 100%;
+    margin-bottom: var(--espacamento-sm);
+    overflow: hidden;
+    border-radius: var(--borda-raio-pequeno);
+    position: relative;
+  }
+
+  .produto-img-container::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 40%;
+    background: linear-gradient(transparent, rgba(0,0,0,0.1));
+    pointer-events: none;
+  }
+
+  .produto-img-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.7s ease;
+  }
+
+  .produto:hover img {
+    transform: scale(1.08);
+  }
+
+  .produto h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 5px;
+    color: var(--cor-primaria);
+  }
+
+  .preco {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--cor-acento);
+    margin: 10px 0;
+    position: relative;
+    display: inline-block;
+  }
+
+  .preco::after {
+    content: '';
+    position: absolute;
+    bottom: -3px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background-color: var(--cor-acento);
+    transition: width 0.3s ease;
+  }
+
+  .produto:hover .preco::after {
+    width: 100%;
+  }
+
+  .estoque {
+    font-size: 0.9rem;
+    color: #777;
+    margin-bottom: var(--espacamento-sm);
+  }
+
+  .avaliacao {
+    color: gold;
+    font-size: 0.9rem;
+    margin-bottom: var(--espacamento-sm);
+    display: flex;
+    justify-content: center;
+    gap: 2px;
+  }
+
+  .avaliacao span {
+    color: var(--cor-texto);
+    margin-left: 5px;
+  }
+
+  .controles-produto {
+    margin-top: auto;
+    display: flex;
+    gap: var(--espacamento-xs);
+    width: 100%;
+  }
+
+  .controles-produto input {
+    width: 60px;
+    text-align: center;
+    border: 1px solid var(--cor-borda-clara);
+    border-radius: var(--borda-raio-pequeno);
+    padding: var(--espacamento-xs) 5px;
+    transition: var(--transicao);
+  }
+
+  .controles-produto input:focus {
+    border-color: var(--cor-acento);
+    box-shadow: 0 0 0 2px rgba(184, 159, 90, 0.2);
+  }
+
+  .controles-produto button {
+    flex-grow: 1;
+    background-color: var(--cor-primaria);
+    color: var(--cor-texto-claro);
+    border: none;
+    padding: var(--espacamento-xs) var(--espacamento-sm);
+    border-radius: var(--borda-raio-pequeno);
+    cursor: pointer;
+    font-weight: 500;
+    transition: var(--transicao);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .controles-produto button::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 5px;
+    height: 5px;
+    background: rgba(255, 255, 255, 0.5);
+    opacity: 0;
+    border-radius: 100%;
+    transform: scale(1, 1) translate(-50%);
+    transform-origin: 50% 50%;
+  }
+
+  .controles-produto button:focus:not(:active)::after {
+    animation: ripple 1s ease-out;
+  }
+
+  @keyframes ripple {
+    0% {
+      transform: scale(0, 0);
+      opacity: 0.5;
     }
+    100% {
+      transform: scale(20, 20);
+      opacity: 0;
+    }
+  }
 
-    const response = await fetch(targetUrl, {
-      method: req.method,
-      headers: headers,
-      body: bodyInfo,
-      redirect: "manual",
+  .controles-produto button:hover {
+    background-color: #333;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  }
+  /* ====================== SELOS E BADGES ATUALIZADOS ====================== */
+  .selo {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background: var(--cor-erro);
+    color: var(--cor-texto-claro);
+    padding: 5px 10px;
+    font-weight: 700;
+    border-bottom-left-radius: var(--borda-raio);
+    z-index: 10;
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%, 10% 50%);
+  }
+
+  .selo.esgotado {
+    background: var(--cor-alerta);
+  }
+
+  /* ====================== PODIUM TOP 3 INVERTIDO ATUALIZADO ====================== */
+  .podium-top3-invertido {
+    display: contents;
+  }
+
+  .produto-top3 {
+    border: 2px solid var(--cor-acento);
+    box-shadow: 0 0 20px rgba(184, 159, 90, 0.4);
+    order: -1;
+    transform: scale(1.03);
+    position: relative;
+  }
+
+  .produto-top3::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    background: linear-gradient(45deg, var(--cor-acento), transparent, var(--cor-acento));
+    border-radius: var(--borda-raio);
+    z-index: -1;
+    opacity: 0;
+    transition: opacity 0.5s;
+  }
+
+  .produto-top3:hover::before {
+    opacity: 1;
+  }
+
+  .badge-top3-premium {
+    position: absolute;
+    top: 0;
+    left: 0;
+    background: var(--cor-acento);
+    color: var(--cor-primaria);
+    padding: 5px 10px;
+    font-weight: 700;
+    border-bottom-right-radius: var(--borda-raio);
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    line-height: 1;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  }
+
+  .badge-top3-premium .medalha {
+    font-size: 1.1rem;
+    color: var(--cor-primaria);
+  }
+
+  .badge-top3-premium small {
+    font-size: 0.75rem;
+    font-weight: 400;
+    color: var(--cor-primaria);
+  }
+
+ /* ====================== CARRINHO FLUTUANTE PREMIUM ====================== */
+.carrinho {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 9999;
+  background: linear-gradient(135deg, var(--cor-acento), #c6ae7a);
+  color: var(--cor-primaria);
+  padding: 16px 28px;
+  border-radius: 50px;
+  box-shadow:
+    0 12px 30px rgba(0, 0, 0, 0.35),
+    0 0 0 4px rgba(255, 255, 255, 0.4),
+    inset 0 0 12px rgba(255, 255, 255, 0.15);
+  cursor: pointer;
+  font-weight: 800;
+  letter-spacing: 0.7px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transition: 0.3s ease;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  animation: carrinhoEntrada 0.9s ease-out;
+}
+
+@keyframes carrinhoEntrada {
+  0% { transform: translateY(50px) scale(0.9); opacity: 0; }
+  100% { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+.carrinho:hover {
+  transform: translateY(-6px) scale(1.05);
+  box-shadow:
+    0 18px 40px rgba(0, 0, 0, 0.5),
+    0 0 0 6px rgba(255, 255, 255, 0.55),
+    inset 0 0 20px rgba(255, 255, 255, 0.22);
+}
+
+.carrinho:active {
+  transform: scale(0.96);
+}
+
+.carrinho i {
+  animation: glowIcon 2.5s infinite ease-in-out;
+}
+
+@keyframes glowIcon {
+  0%, 100% { filter: drop-shadow(0 0 0px var(--cor-acento)); }
+  50% { filter: drop-shadow(0 0 5px var(--cor-acento)); }
+}
+
+/* ====================== CONTADOR DO CARRINHO ====================== */
+.carrinho-count {
+  background: var(--cor-erro);
+  color: var(--cor-texto-claro);
+  border-radius: 50%;
+  padding: 4px 9px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  min-width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+  transition: 0.25s ease;
+}
+
+.carrinho-count.animar-adicao {
+  transform: scale(1.35);
+  background: var(--cor-sucesso);
+}
+
+/* ====================== PAINEL DE FINALIZAÇÃO LUXURY ====================== */
+.finalizar {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 420px;
+  max-width: 95%;
+  height: 100%;
+  background: linear-gradient(to bottom right, #ffffff, #f6f3ed);
+  box-shadow: -12px 0 45px rgba(0, 0, 0, 0.25);
+  padding: 35px;
+  transform: translateX(100%);
+  transition: transform 0.7s cubic-bezier(0.77, 0, 0.175, 1);
+  z-index: 99999;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  border-left: 2px solid rgba(0, 0, 0, 0.05);
+}
+
+.overlay-finalizar {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(5px);
+  z-index: 99998;
+  opacity: 0;
+  pointer-events: none;
+  transition: 0.4s ease-out;
+}
+
+.finalizar[aria-hidden="false"] {
+  transform: translateX(0);
+}
+
+.finalizar[aria-hidden="false"] ~ .overlay-finalizar {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* ====================== BOTÃO DE FECHAR ====================== */
+.fechar-carrinho {
+  position: absolute;
+  top: 25px;
+  right: 25px;
+  background: var(--cor-fundo);
+  border: none;
+  border-radius: 50%;
+  width: 45px;
+  height: 45px;
+  font-size: 1.4rem;
+  color: var(--cor-erro);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow:
+    0 4px 12px rgba(0,0,0,0.15),
+    inset 1px 1px 5px rgba(255,255,255,0.4);
+  transition: 0.35s ease;
+}
+
+.fechar-carrinho:hover {
+  transform: rotate(90deg) scale(1.18);
+}
+
+/* ====================== LISTA DO CARRINHO ====================== */
+.finalizar h2 {
+  font-family: 'Playfair Display', serif;
+  color: var(--cor-primaria);
+  font-size: 2.3rem;
+  margin-bottom: 25px;
+  border-bottom: 3px solid var(--cor-acento);
+  padding-bottom: 15px;
+}
+
+#listaCarrinho {
+  list-style: none;
+  padding: 0;
+  margin-bottom: 30px;
+  flex-grow: 1;
+}
+
+.item-carrinho {
+  display: grid;
+  grid-template-areas: 
+    "title actions"
+    "meta actions"
+    "sub actions";
+  grid-template-columns: 1fr max-content;
+  gap: 2px 15px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--cor-borda-clara);
+  transition: 0.25s ease;
+}
+
+.item-carrinho:hover {
+  background-color: var(--cor-hover-lista);
+  padding-left: 7px;
+}
+
+.item-carrinho.desejo {
+  background: #fff7dd;
+  border-left: 6px solid var(--cor-acento);
+  border-radius: 6px;
+  padding: 14px;
+  margin: 12px 0;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.05);
+}
+
+/* textos */
+.item-title { grid-area: title; font-weight: 800; }
+.item-meta { grid-area: meta; font-size: 0.92rem; color: #888; }
+.item-sub  { grid-area: sub; font-style: italic; margin-top: 6px; }
+
+/* ações */
+.item-actions { grid-area: actions; align-self: center; display: flex; gap: 10px; }
+
+.item-actions button {
+  background: none;
+  border: none;
+  font-size: 1.25rem;
+  cursor: pointer;
+  color: var(--cor-primaria);
+  opacity: 0.55;
+  transition: 0.2s ease;
+}
+
+.item-actions button:hover {
+  opacity: 1;
+  color: var(--cor-erro);
+  transform: scale(1.2);
+}
+
+/* ====================== TOTAL ====================== */
+.total {
+  font-size: 1.9rem;
+  font-weight: 900;
+  color: var(--cor-acento);
+  margin-top: 30px;
+  padding-top: 18px;
+  border-top: 3px dashed var(--cor-borda-clara);
+  text-align: right;
+  letter-spacing: 1.3px;
+}
+
+
+
+/* ====================== BOTÃO WHATSAPP PREMIUM ====================== */
+#enviarWhats {
+  width: 100%;
+  background: linear-gradient(135deg, #25D366, #1ebe5e);
+  color: white;
+  padding: 20px;
+  border: none;
+  border-radius: 12px;
+  font-size: 1.25rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: 0.35s ease;
+  margin-top: 25px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow:
+    0 6px 15px rgba(37, 211, 102, 0.4),
+    0 0 12px rgba(37, 211, 102, 0.35);
+}
+
+#enviarWhats i {
+  margin-right: 12px;
+  font-size: 1.55rem;
+}
+
+#enviarWhats:hover {
+  transform: translateY(-3px);
+  box-shadow:
+    0 10px 22px rgba(37, 211, 102, 0.55),
+    0 0 15px rgba(37, 211, 102, 0.6);
+}
+
+#enviarWhats:hover i {
+  transform: rotate(8deg) scale(1.07);
+}
+
+#enviarWhats:disabled {
+  background: #b2e5c4;
+  opacity: 0.7;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+  /* ====================== NOTIFICAÇÃO ATUALIZADA ====================== */
+  .notificacao {
+    position: fixed;
+    top: 90px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-150%);
+    background: var(--cor-sucesso);
+    color: var(--cor-texto-claro);
+    padding: 18px 30px;
+    border-radius: 8px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+    font-weight: 600;
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    z-index: 7000;
+    display: flex;
+    align-items: center;
+    min-width: 250px;
+    text-align: center;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+
+  .notificacao.mostrar {
+    transform: translateX(-50%) translateY(0);
+  }
+
+  .notificacao.erro {
+    background: var(--cor-erro);
+  }
+
+  .notificacao.aviso {
+    background: var(--cor-alerta);
+  }
+
+  .notificacao i {
+    margin-right: 15px;
+    font-size: 1.3rem;
+  }
+
+  /* ====================== LOGO FLUTUANTE ATUALIZADA ====================== */
+  .logo-flutuante {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    opacity: 0.1;
+    z-index: 1000;
+    pointer-events: none;
+    animation: subtle-pulse 10s infinite ease-in-out;
+  }
+
+  @keyframes subtle-pulse {
+    0%, 100% { opacity: 0.1; transform: scale(1); }
+    50% { opacity: 0.15; transform: scale(1.02); }
+  }
+
+  /* ====================== RODAPÉ ATUALIZADO ====================== */
+  footer {
+    background: linear-gradient(135deg, var(--cor-primaria) 0%, #2a2a2a 100%);
+    color: #bbb;
+    padding: 30px 20px;
+    text-align: center;
+    margin-top: 50px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  footer::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, var(--cor-acento), transparent);
+  }
+
+  .footer-content p {
+    margin: 5px 0;
+    font-size: 0.9rem;
+  }
+
+  .social-links {
+    margin: 15px 0;
+  }
+
+  .social-links a {
+    color: var(--cor-acento);
+    font-size: 1.5rem;
+    margin: 0 10px;
+    transition: var(--transicao);
+    display: inline-block;
+  }
+
+  .social-links a:hover {
+    color: var(--cor-texto-claro);
+    transform: translateY(-3px);
+  }
+
+  /* ====================== RESPONSIVIDADE REFINADA ====================== */
+  @media (max-width: 900px) {
+    .finalizar {
+      width: 300px;
+    }
+    
+    .produtos {
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    }
+  }
+
+  @media (max-width: 768px) {
+    .header-elegante {
+      padding: 12px 15px;
+    }
+    
+    .header-texto h1 {
+      font-size: 1.5rem;
+    }
+    
+    .controles-produtos {
+      flex-direction: column;
+    }
+    
+    .pesquisa-container {
+      width: 100%;
+    }
+  }
+
+  @media (max-width: 500px) {
+    .finalizar {
+      width: 100%;
+      max-width: 100%;
+      padding: 20px;
+    }
+    
+    .carrinho {
+      bottom: 15px;
+      right: 15px;
+      padding: 10px 18px;
+    }
+    
+    .carrinho span:not(.carrinho-count) {
+      display: none;
+    }
+    
+    .carrinho i {
+      margin: 0;
+    }
+    
+    .produtos {
+      grid-template-columns: 1fr;
+    }
+  }
+  /* ====================== ESTILOS DO SISTEMA DE ATACADO ====================== */
+
+/* Badge de atacado no card */
+.badge-atacado-card {
+    position: absolute;
+    top: 50px;
+    right: 12px;
+    background: linear-gradient(135deg, #27ae60, #2ecc71);
+    color: white;
+    padding: 8px 12px;
+    border-radius: 25px;
+    font-size: 0.75rem;
+    font-weight: bold;
+    z-index: 15;
+    box-shadow: 0 4px 15px rgba(46, 204, 113, 0.4);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    line-height: 1.2;
+    animation: pulseAtacado 2s infinite;
+}
+
+.badge-atacado-card i {
+    font-size: 0.8rem;
+    margin-bottom: 2px;
+}
+
+.badge-atacado-info {
+    font-size: 0.65rem;
+    opacity: 0.9;
+}
+
+/* Selo sobreposto na imagem */
+.selo-atacado-imagem {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    background: rgba(39, 174, 96, 0.9);
+    color: white;
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    line-height: 1;
+    backdrop-filter: blur(2px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    z-index: 10;
+}
+
+.selo-atacado-imagem span {
+    font-size: 1rem;
+}
+
+.selo-atacado-imagem small {
+    font-size: 0.6rem;
+    opacity: 0.9;
+}
+
+/* Container de preços */
+.precos-container {
+    margin-bottom: 10px;
+}
+
+.preco-produto {
+    margin: 5px 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+}
+
+.preco-varejo .preco-label {
+    font-size: 0.8rem;
+    color: #666;
+    margin-right: 5px;
+}
+
+.preco-atacado {
+    background: #e8f5e9;
+    padding: 8px;
+    border-radius: 8px;
+    margin-top: 5px;
+}
+
+.preco-atacado .preco-label {
+    color: #27ae60;
+    font-weight: 600;
+    font-size: 0.8rem;
+    margin-right: 5px;
+}
+
+.preco-atacado .preco-label i {
+    margin-right: 3px;
+}
+
+.preco-atacado .preco-valor {
+    color: #27ae60;
+    font-size: 1.2rem;
+}
+
+.preco-atacado .preco-valor strong {
+    font-size: 1.3rem;
+}
+
+.economia-badge {
+    display: block;
+    font-size: 0.7rem;
+    color: #27ae60;
+    margin-top: 3px;
+    width: 100%;
+}
+
+/* Badge de atacado no carrinho */
+.badge-atacado {
+    display: inline-block;
+    background: linear-gradient(135deg, #27ae60, #2ecc71);
+    color: white;
+    font-size: 0.65rem;
+    font-weight: bold;
+    padding: 3px 8px;
+    border-radius: 12px;
+    margin-left: 8px;
+    vertical-align: middle;
+    animation: pulseAtacado 2s infinite;
+}
+
+/* Informação dinâmica de atacado no card */
+.info-atacado-dinamico {
+    margin-top: 10px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+}
+
+.info-atacado-dinamico i {
+    font-size: 0.9rem;
+}
+
+/* Item de economia no carrinho */
+.item-economia {
+    font-size: 0.8rem;
+    color: #27ae60;
+    margin-top: 4px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.item-economia::before {
+    content: "💰";
+    font-size: 0.9rem;
+}
+
+/* Animações */
+@keyframes pulseAtacado {
+    0%, 100% { 
+        transform: scale(1);
+        box-shadow: 0 4px 15px rgba(46, 204, 113, 0.4);
+    }
+    50% { 
+        transform: scale(1.05);
+        box-shadow: 0 8px 25px rgba(46, 204, 113, 0.6);
+    }
+}
+
+/* Responsividade para mobile */
+@media (max-width: 768px) {
+    .badge-atacado-card {
+        top: 40px;
+        padding: 6px 10px;
+        font-size: 0.7rem;
+    }
+    
+    .preco-atacado .preco-valor {
+        font-size: 1rem;
+    }
+    
+    .preco-atacado .preco-valor strong {
+        font-size: 1.1rem;
+    }
+    
+    .economia-badge {
+        font-size: 0.65rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .badge-atacado-card {
+        top: 35px;
+        right: 8px;
+        padding: 4px 8px;
+    }
+    
+    .selo-atacado-imagem {
+        padding: 3px 8px;
+        font-size: 0.7rem;
+    }
+    
+    .selo-atacado-imagem span {
+        font-size: 0.9rem;
+    }
+}
+
+/* Estilo para o filtro de atacado ativo */
+.filtro-btn[data-filtro="atacado"].ativo {
+    background: linear-gradient(135deg, #27ae60, #2ecc71);
+    border-color: #27ae60;
+}
+
+/* Tooltip de informação */
+[data-tooltip] {
+    position: relative;
+    cursor: help;
+}
+
+[data-tooltip]:hover::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #333;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 0.7rem;
+    white-space: nowrap;
+    z-index: 20;
+    margin-bottom: 5px;
+}
+
+/* Destaque para produtos com atacado no grid */
+.produto[data-preco-atacado]:not([data-preco-atacado=""]) {
+    border-left: 3px solid #27ae60;
+}
+
+/* Input de quantidade estilizado */
+.input-quantidade {
+    width: 70px !important;
+    text-align: center;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 8px 5px;
+    font-size: 0.9rem;
+}
+
+.input-quantidade:focus {
+    border-color: #27ae60;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(39, 174, 96, 0.2);
+}
+
+/* Mensagem no banner promocional */
+.banner-promocao span {
+    display: inline-block;
+    animation: slideBanner 0.5s ease;
+}
+
+@keyframes slideBanner {
+    from {
+        transform: translateY(-100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+</style>
+
+</head>
+<body>
+
+<header class="header-elegante">
+  <img 
+    src="/IMG-20251107-WA1870.jpg"
+    alt="GK Premium Logo"
+    class="logo-min"
+  >
+
+  <div class="header-texto">
+    <h1>GK Premium</h1>
+    <p>Maquiagem • Cosméticos • Elegância</p>
+  </div>
+</header>
+
+<div class="banner-promocao">
+  <span>🔥 ATACADO: 3+ unidades do mesmo produto com preço especial! 🔥</span>
+</div>
+
+<div class="container">
+
+  <!-- 🔍 ÁREA DE CONTROLES -->
+  <div class="controles-produtos">
+
+    <!-- Barra de pesquisa -->
+    <div class="pesquisa-container">
+      <i class="fas fa-search"></i>
+      <input type="text" id="pesquisa" placeholder="Buscar produtos...">
+    </div>
+
+    <!-- Filtros aprimorados -->
+    <div class="filtros-container">
+      <button class="filtro-btn ativo" data-filtro="todos">
+        <i class="fas fa-th-large"></i> Todos
+      </button>
+
+      <button class="filtro-btn" data-filtro="acessorio">
+        <i class="fas fa-gem"></i> Acessórios
+      </button>
+
+      <button class="filtro-btn" data-filtro="roupas-femininas">
+        <i class="fas fa-female"></i> Femininas
+      </button>
+
+      <button class="filtro-btn" data-filtro="roupas-masculinas">
+        <i class="fas fa-male"></i> Masculinas
+      </button>
+
+      <button class="filtro-btn" data-filtro="novos">
+        <i class="fas fa-star"></i> Novidades
+      </button>
+
+      <button class="filtro-btn" data-filtro="disponivel">
+        <i class="fas fa-check-circle"></i> Disponível
+      </button>
+
+      <button class="filtro-btn" data-filtro="esgotado">
+        <i class="fas fa-times-circle"></i> Esgotado
+      </button>
+      
+      <!-- NOVO FILTRO: Atacado -->
+      <button class="filtro-btn" data-filtro="atacado">
+        <i class="fas fa-tags"></i> Com Atacado
+      </button>
+    </div>
+  </div>
+
+
+  <!-- 🔥 GRID PREMIUM DE PRODUTOS -->
+  <div class="produtos grid-premium" id="produtos">
+
+    <% 
+      function safeParseFloatEJS(v){ 
+        const val = String(v).replace(',', '.');
+        const num = parseFloat(val); 
+        return isNaN(num) ? 0 : num;
+      }
+
+      const produtosComId = produtos.map(prod => ({
+        ...prod,
+        id: prod.Item,
+        estoque: prod["ESTOQUE "] || prod.ESTOQUE,
+        vendido: prod["Vendido (QNTD)"] || 0,
+        valorVenda: prod["Valor Venda (R$)"],
+        valorAtacado: prod["Valor Atacado (R$)"] || 0,
+        descricao: prod.Descrição
+      }));
+
+      function getTagEspecial(prod) {
+        if (prod.estoque === 0) return "🚫 Indisponível";
+        if (prod.vendido >= 10) return "🔥 Alta procura";
+        if (prod.vendido > 0) return "⭐ Saindo bastante";
+        if (prod.valorAtacado && prod.valorAtacado > 0) return "🏷️ Atacado disponível";
+        return "✨ Novo";
+      }
+    %>
+
+    <% produtosComId.forEach(prod => { %>
+
+      <div class="produto card-premium"
+        data-id="<%= prod.id %>"
+        data-nome="<%= prod.descricao.toLowerCase() %>"
+        data-estoque="<%= prod.estoque %>"
+        data-vendido="<%= prod.vendido %>"
+        data-preco-varejo="<%= safeParseFloatEJS(prod.valorVenda).toFixed(2) %>"
+        data-preco-atacado="<%= prod.valorAtacado ? safeParseFloatEJS(prod.valorAtacado).toFixed(2) : '' %>">
+
+        <!-- ⭐ TAG ESPECIAL MELHORADA -->
+        <div class="tag-dinamica pulse-premium">
+          <%= getTagEspecial(prod) %>
+        </div>
+
+        <!-- 🏷️ BADGE DE ATACADO (se tiver preço de atacado) -->
+        <% if (prod.valorAtacado && prod.valorAtacado > 0) { %>
+          <div class="badge-atacado-card">
+            <i class="fas fa-tags"></i> ATACADO
+            <span class="badge-atacado-info">3+ unidades</span>
+          </div>
+        <% } %>
+
+        <!-- 📸 IMAGEM -->
+        <div class="produto-img-container premium-img">
+          <img src="<%= prod.Imagem || '/IMG-20251107-WA1870.jpg' %>"
+               alt="<%= prod.descricao %>">
+          
+          <!-- SELO DE ATACADO SOBREPOSTO NA IMAGEM -->
+          <% if (prod.valorAtacado && prod.valorAtacado > 0) { %>
+            <div class="selo-atacado-imagem">
+              <span>3+</span>
+              <small>ATACADO</small>
+            </div>
+          <% } %>
+        </div>
+
+        <!-- 🏷️ NOME -->
+        <h3 class="titulo-produto"><%= prod.descricao %></h3>
+
+        <!-- 💵 PREÇOS (VAREJO E ATACADO) -->
+        <div class="precos-container">
+          <p class="preco-produto preco-varejo">
+            <span class="preco-label">Varejo:</span>
+            <span class="preco-valor">R$ <strong><%= safeParseFloatEJS(prod.valorVenda).toFixed(2) %></strong></span>
+          </p>
+          
+          <% if (prod.valorAtacado && prod.valorAtacado > 0) { %>
+            <p class="preco-produto preco-atacado">
+              <span class="preco-label"><i class="fas fa-tag"></i> Atacado (3+):</span>
+              <span class="preco-valor">R$ <strong><%= safeParseFloatEJS(prod.valorAtacado).toFixed(2) %></strong></span>
+              <span class="economia-badge">Economia de R$ <%= (safeParseFloatEJS(prod.valorVenda) - safeParseFloatEJS(prod.valorAtacado)).toFixed(2) %> por unidade</span>
+            </p>
+          <% } %>
+        </div>
+
+        <!-- ⭐ AVALIAÇÃO -->
+        <div class="avaliacao-luxo">
+          <div class="stars">
+            <i class="fas fa-star"></i><i class="fas fa-star"></i>
+            <i class="fas fa-star"></i><i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+          </div>
+          <span>Favorito dos clientes</span>
+        </div>
+
+        <!-- 📦 ESTOQUE -->
+        <p class="estoque-premium">
+          <i class="fas fa-box"></i>
+          <%= prod.estoque > 0 ? prod.estoque + ' unidades' : 'Sem estoque' %>
+        </p>
+
+        <!-- 📊 POPULARIDADE -->
+        <%
+          const totalEstimado = prod.vendido + prod.estoque;
+          const popularidade = totalEstimado > 0 ? Math.round((prod.vendido / totalEstimado) * 100) : 0;
+        %>
+
+        <div class="popularidade-bar melhorada">
+          <div class="bar" style="width: <%= popularidade %>%"></div>
+        </div>
+
+        <p class="popularidade-texto"><%= popularidade %>% dos clientes escolheram</p>
+
+        <!-- 🛒 AÇÕES -->
+        <% if (prod.estoque > 0) { %>
+          <div class="acoes-premium">
+            <input type="number" min="1" max="<%= prod.estoque %>" value="1" id="qtd-<%= prod.id %>" class="input-quantidade">
+            <button class="btn-add-premium" onclick="adicionarCarrinho('<%= prod.id %>')">
+              <i class="fas fa-shopping-bag"></i> Comprar
+            </button>
+          </div>
+          
+          <!-- INFO DINÂMICA DE ATACADO (atualizada via JS) -->
+          <div class="info-atacado-dinamico" id="info-atacado-<%= prod.id %>" style="display: none;">
+            <i class="fas fa-info-circle"></i>
+            <span></span>
+          </div>
+        <% } else { %>
+          <button class="btn-esgotado-premium" onclick="desejoComprar('<%= prod.descricao %>')">
+            <i class="fas fa-bell"></i> Avise-me
+          </button>
+        <% } %>
+
+      </div>
+
+    <% }) %>
+
+  </div>
+</div>
+
+<footer>
+  <div class="footer-content">
+    <p>GK Premium - Sua loja de moda e estilo</p>
+    <div class="social-links">
+      <a href="https://www.instagram.com/gk.cosmetics_?igsh=a3M0amVpeHZzcjRv" target="_blank" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+      <a href="https://facebook.com" target="_blank" aria-label="Facebook"><i class="fab fa-facebook"></i></a>
+      <a href="https://wa.me/559285341621" target="_blank" aria-label="WhatsApp"><i class="fab fa-whatsapp"></i></a>
+    </div>
+    <p>Entre em contato: **+55 92 8534-1621**</p>
+    <p>&copy; 2025 maquiaGem e Kosmeticos. Todos os direitos reservados.</p>
+  </div>
+</footer>
+
+<!-- WIDGET DO PLAYER DE MÚSICA -->
+<div id="music-widget" class="widget hidden neumorphism">
+    <div class="widget-header">
+        <span class="title">✨ Vibe Music Player</span>
+        <button id="music-close" class="close-btn">✕</button>
+    </div>
+
+  <div id="music-search">
+    <input id="query" type="text" placeholder="Buscar música..." />
+    <button id="search-btn" title="Buscar e Tocar">
+        <span class="icon">🔍</span>
+        <span class="loader hidden"></span>
+    </button>
+  </div>
+
+    <div class="suggestions">
+        <div class="suggestion-tag" onclick="setSuggestion('Doja Cat Kiss Me More')">Doja Cat</div>
+        <div class="suggestion-tag" onclick="setSuggestion('kanye west closed on sunday')">Kanye West</div>
+        <div class="suggestion-tag" onclick="setSuggestion('Allan Walker - Faded')">Allan Walker</div>
+        <div class="suggestion-tag" onclick="setSuggestion('Melhor Amigo (Jesus Está la) Nair Nany')">Gospel</div>
+        <div class="suggestion-tag" onclick="setSuggestion('Harry Styles As It Was')">Harry Styles</div>
+        <div class="suggestion-tag" onclick="setSuggestion('Metallica Enter Sandman')">Rock</div>
+    </div>
+
+    <p id="status-message" class="status-msg">Digite o nome de uma música 🎶</p>
+
+    <div id="progress-container" class="progress-container hidden">
+        <div class="progress-circle">
+            <svg viewBox="0 0 36 36">
+                <path class="progress-circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                <path class="progress-circle-fill" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" stroke-dasharray="0, 100" id="progress-path" />
+            </svg>
+            <div class="progress-text" id="progress-text">0%</div>
+        </div>
+        <div class="loading-message" id="loading-message">Iniciando busca...</div>
+    </div>
+
+    <div id="music-content" class="hidden">
+        <div class="thumb-box">
+            <img id="song-thumb" class="thumb" alt="Capa da música" />
+        </div>
+
+        <h3 id="song-title"></h3>
+        <audio id="audio" preload="metadata"></audio>
+
+        <div id="equalizer" class="equalizer hidden">
+            <div class="bar bar-1"></div>
+            <div class="bar bar-2"></div>
+            <div class="bar bar-3"></div>
+            <div class="bar bar-4"></div>
+            <div class="bar bar-5"></div>
+        </div>
+
+        <div class="custom-controls">
+            <div class="time-info">
+                <span id="current-time">0:00</span> / <span id="audio-duration" class="duration">0:00</span>
+            </div>
+            
+            <div class="progress-bar-container" id="progress-bar-container">
+                <div id="progress-bar"></div>
+            </div>
+        </div>
+
+        <a id="btn-download" class="download-btn" download>⬇ Baixar MP3</a>
+        <button id="music-toggle" class="music-control">▶️</button>
+    </div>
+</div>
+
+<div id="music-notif" class="notif hidden"></div>
+
+<!-- BOTÃO 1: abrir o widget -->
+<button id="widget-toggle" class="floating-btn">🎧</button>
+
+<!-- CARRINHO FLUTUANTE -->
+<div class="carrinho" id="carrinhoBtn" role="button" tabindex="0" aria-label="Abrir carrinho">
+  <i class="fas fa-shopping-bag"></i> Carrinho 
+  <span class="carrinho-count" id="carrinhoCount">0</span>
+</div>
+
+
+<!-- Painel do Carrinho (Side Panel Moderno) -->
+<div class="finalizar" id="finalizar" aria-hidden="true">
+
+  <!-- Cabeçalho do painel -->
+  <div class="carrinho-header">
+    <h2 class="titulo-carrinho">
+      <i class="fas fa-shopping-bag"></i>
+      Seu Carrinho
+    </h2>
+
+    <button class="fechar-carrinho" id="fecharCarrinho" aria-label="Fechar carrinho">
+      <i class="fas fa-times"></i>
+    </button>
+  </div>
+
+  <!-- Lista dos itens -->
+  <ul id="listaCarrinho" class="lista-carrinho"></ul>
+
+  <!-- Rodapé com total e botão -->
+  <div class="carrinho-footer">
+    <p class="total" id="totalCarrinho">
+      <span>Total:</span> <strong>R$ 0,00</strong>
+    </p>
+
+    <button id="enviarWhats" type="button" class="btn-whats" title="Finalizar pelo WhatsApp">
+      <i class="fab fa-whatsapp"></i>
+      Finalizar Compra
+    </button>
+  </div>
+</div>
+
+<div class="notificacao" id="notificacao" aria-live="polite" role="status" style="display:none;">
+  <i class="fas fa-check-circle"></i>
+  <span id="notificacaoTexto"></span>
+</div>
+
+<img src="/IMG-20251107-WA1870.jpg" 
+     alt="Logo GK Premium (Sutil)" 
+     class="logo-flutuante">
+
+<!-- SCRIPTS -->
+<script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+<script>
+window.OneSignalDeferred = window.OneSignalDeferred || [];
+OneSignalDeferred.push(async function(OneSignal) {
+    await OneSignal.init({
+      appId: "fb30feba-6893-44d2-a434-6248bbc492cc",
+      allowLocalhostAsSecureOrigin: true
     });
 
-    const location = response.headers.get("location");
-    if (location) {
-      let redirectUrl = location;
-      if (redirectUrl.startsWith("/")) {
-        redirectUrl = MASK + redirectUrl;
-      } else if (redirectUrl.startsWith(BASE)) {
-        redirectUrl = redirectUrl.replace(BASE, MASK);
-      }
-      res.setHeader("Location", redirectUrl);
-      return res.status(response.status).end();
+    const permission = await OneSignal.Notifications.permission;
+    if (permission !== "granted") {
+        OneSignal.showSlidedownPrompt();
     }
+});
+</script>
 
-    const cookies = response.headers.raw()["set-cookie"];
-    if (cookies) {
-      cookies.forEach(cookie => {
-        res.append("Set-Cookie", cookie);
-      });
-    }
+<script>
+// ---------- ELEMENTOS ----------
+const produtosContainer = document.getElementById('produtos');
+const carrinhoBtn = document.getElementById('carrinhoBtn');
+const fecharBtn = document.getElementById('fecharCarrinho');
+const carrinhoCount = document.getElementById('carrinhoCount');
 
-    const responseType = response.headers.get("content-type") || "";
-    if (responseType) res.setHeader("Content-Type", responseType);
+const finalizarDiv = document.getElementById('finalizar');
+const listaCarrinho = document.getElementById('listaCarrinho');
+const totalCarrinho = document.getElementById('totalCarrinho');
+const enviarWhats = document.getElementById('enviarWhats');
 
-    if (responseType.includes("text/") || responseType.includes("application/json") || responseType.includes("application/javascript")) {
-      let textContent = await response.text();
-      
-      // Apenas trocamos os links absolutos que o backend enviar de volta, para manter tudo no Vercel
-      textContent = textContent.replace(/http:\/\/br2\.bronxyshost\.com:4009\/lojagk/g, MASK);
-      textContent = textContent.replace(/http:\/\/br2\.bronxyshost\.com:4009/g, MASK);
+const pesquisaInput = document.getElementById('pesquisa');
+const notificacao = document.getElementById('notificacao');
+const notificacaoTexto = document.getElementById('notificacaoTexto');
+const filtroBtns = document.querySelectorAll('.filtro-btn');
 
-      res.send(textContent);
-    } else {
-      // Aqui as imagens passam em formato binário diretamente pro navegador!
-      const arrayBuffer = await response.arrayBuffer();
-      res.send(Buffer.from(arrayBuffer));
+
+// ---------- ESTADO GLOBAL ----------
+window.__gk_carrinho = [];
+const carrinho = window.__gk_carrinho;
+const desejos = [];
+let filtroAtual = "todos";
+
+
+// ---------- FUNÇÕES UTIL ----------
+function safeParseFloat(v){
+  return isNaN(parseFloat(String(v).replace(',', '.')))
+    ? 0 
+    : parseFloat(String(v).replace(',', '.'));
+}
+
+function mostrarNotificacao(texto, tipo='win'){
+  notificacaoTexto.textContent = texto;
+  notificacao.style.display = 'flex';
+
+  notificacao.style.background = tipo === 'win'
+    ? 'var(--cor-sucesso)'
+    : 'var(--cor-erro)';
+
+  notificacao.querySelector('i').className = tipo === 'win'
+    ? 'fas fa-check-circle'
+    : 'fas fa-times-circle';
+
+  notificacao.classList.add('mostrar');
+
+  setTimeout(() => {
+    notificacao.classList.remove('mostrar');
+    setTimeout(() => notificacao.style.display = 'none', 300);
+  }, 2300);
+}
+
+
+// ---------- CONTADOR ----------
+function atualizarContadorCarrinho(){
+  const totalItens = carrinho.reduce((acc,p) => acc + p.qtd, 0) + desejos.length;
+  carrinhoCount.textContent = totalItens;
+  carrinhoBtn.setAttribute('aria-label', `Carrinho com ${totalItens} itens`);
+}
+
+// ---------- SLIDE DO CARRINHO ----------
+function abrirCarrinho(){
+  finalizarDiv.style.display = 'block';
+  setTimeout(() => finalizarDiv.setAttribute('aria-hidden','false'), 10);
+}
+function fecharCarrinho(){
+  finalizarDiv.setAttribute('aria-hidden','true');
+  setTimeout(() => finalizarDiv.style.display = 'none', 400);
+}
+fecharBtn.addEventListener('click', () => fecharCarrinho());
+carrinhoBtn.addEventListener('click', e => {
+  e.stopPropagation();
+  const isOpen = finalizarDiv.getAttribute('aria-hidden') === 'false';
+  if(isOpen) fecharCarrinho(); else abrirCarrinho();
+});
+
+document.addEventListener('click', e => {
+  const path = e.composedPath();
+  if(path.includes(finalizarDiv) || path.includes(carrinhoBtn)) return;
+  fecharCarrinho();
+});
+
+
+// ---------- FILTROS ----------
+filtroBtns.forEach(btn => {
+  btn.addEventListener('click', () => {
+    filtroBtns.forEach(b => b.classList.remove('ativo'));
+    btn.classList.add('ativo');
+    filtroAtual = btn.dataset.filtro || 'todos';
+    aplicarFiltros?.();
+  });
+});
+
+
+// ======================================================
+//  🔥 SISTEMA DE PREÇO POR ATACADO (3+ unidades)
+// ======================================================
+
+// Função para calcular o preço baseado na quantidade
+function calcularPrecoProduto(prodDiv, quantidade) {
+    const precoVarejo = parseFloat(prodDiv.dataset.precoVarejo);
+    const precoAtacado = prodDiv.dataset.precoAtacado ? parseFloat(prodDiv.dataset.precoAtacado) : null;
+    
+    // Se tem preço de atacado E quantidade >= 3, usa preço de atacado
+    if (precoAtacado && precoAtacado > 0 && quantidade >= 3) {
+        return {
+            preco: precoAtacado,
+            tipo: 'atacado',
+            economia: (precoVarejo - precoAtacado) * quantidade
+        };
     }
     
-  } catch (error) {
-    console.error("❌ Erro no proxy:", error);
-    res.status(500).send("Erro de comunicação com o servidor original.");
+    // Senão, usa preço de varejo
+    return {
+        preco: precoVarejo,
+        tipo: 'varejo',
+        economia: 0
+    };
+}
+
+// Função para atualizar a informação dinâmica de atacado no card
+function atualizarInfoAtacado(prodId, quantidade) {
+    const infoDiv = document.getElementById(`info-atacado-${prodId}`);
+    if (!infoDiv) return;
+    
+    const prodDiv = document.querySelector(`[data-id="${prodId}"]`);
+    const precoAtacado = prodDiv.dataset.precoAtacado ? parseFloat(prodDiv.dataset.precoAtacado) : null;
+    
+    if (!precoAtacado || precoAtacado <= 0) {
+        infoDiv.style.display = 'none';
+        return;
+    }
+    
+    if (quantidade >= 3) {
+        infoDiv.style.display = 'flex';
+        infoDiv.querySelector('span').textContent = `✅ Preço de atacado aplicado!`;
+        infoDiv.style.background = '#e8f5e9';
+        infoDiv.style.color = '#27ae60';
+    } else {
+        const faltam = 3 - quantidade;
+        infoDiv.style.display = 'flex';
+        infoDiv.querySelector('span').textContent = `➕ Adicione mais ${faltam} para preço de atacado`;
+        infoDiv.style.background = '#fff3e0';
+        infoDiv.style.color = '#e67e22';
+    }
+}
+
+// Modificar a função adicionarCarrinho
+window.adicionarCarrinho = function(id){
+  const input = document.getElementById(`qtd-${id}`);
+  if(!input){
+    mostrarNotificacao("Erro: Quantidade não encontrada", "lose");
+    return;
+  }
+
+  const qtd = parseInt(input.value) || 0;
+  if(qtd < 1){
+    mostrarNotificacao("Quantidade mínima é 1!", "lose");
+    return;
+  }
+
+  const prodDiv = document.querySelector(`[data-id="${id}"]`);
+  if(!prodDiv){
+    mostrarNotificacao("Erro: Produto não encontrado", "lose");
+    return;
+  }
+
+  const titulo = prodDiv.querySelector("h3, .titulo, .nome-produto")?.textContent.trim() || "Produto";
+  const precoVarejo = parseFloat(prodDiv.dataset.precoVarejo);
+  const precoAtacado = prodDiv.dataset.precoAtacado ? parseFloat(prodDiv.dataset.precoAtacado) : null;
+  const estoque = parseInt(prodDiv.dataset.estoque || "99999");
+
+  if(qtd > estoque){
+    mostrarNotificacao(`Estoque máximo: ${estoque}`, "lose");
+    return;
+  }
+
+  // Verificar se já existe no carrinho
+  const existente = carrinho.find(p => p.id === id);
+  let quantidadeTotal = qtd;
+  
+  if(existente){
+    quantidadeTotal = existente.qtd + qtd;
+    if(quantidadeTotal > estoque){
+      mostrarNotificacao(`Só é possível adicionar mais ${estoque - existente.qtd}`, "lose");
+      return;
+    }
+  }
+
+  // Calcular preço baseado na quantidade TOTAL
+  const precoInfo = calcularPrecoProduto(prodDiv, quantidadeTotal);
+  
+  if(existente){
+    existente.qtd = quantidadeTotal;
+    existente.valor = precoInfo.preco;
+    existente.tipoPreco = precoInfo.tipo;
+    existente.precoVarejo = precoVarejo;
+    existente.precoAtacado = precoAtacado;
+    
+    if(precoInfo.tipo === 'atacado' && existente.tipoPrecoOriginal !== 'atacado') {
+      mostrarNotificacao(`🎉 Parabéns! Preço de atacado aplicado! Economia de R$ ${precoInfo.economia.toFixed(2)}`, "win");
+    }
+  } else {
+    carrinho.push({ 
+      id, 
+      descricao: titulo, 
+      valor: precoInfo.preco,
+      precoVarejo: precoVarejo,
+      precoAtacado: precoAtacado,
+      qtd,
+      tipoPreco: precoInfo.tipo
+    });
+    
+    if(precoInfo.tipo === 'atacado'){
+      mostrarNotificacao(`🏷️ Preço de atacado aplicado! Economia de R$ ${precoInfo.economia.toFixed(2)}`, "win");
+    } else {
+      mostrarNotificacao(`✅ ${titulo} adicionado!`, "win");
+    }
+  }
+
+  // Atualizar informação de atacado no card
+  if (precoAtacado && precoAtacado > 0) {
+    const existenteNoCarrinho = carrinho.find(p => p.id === id);
+    if (existenteNoCarrinho) {
+      atualizarInfoAtacado(id, existenteNoCarrinho.qtd);
+    }
+  }
+
+  atualizarCarrinho();
+  input.value = 1;
+  abrirCarrinho();
+};
+
+// Função para verificar se um produto tem atacado
+function temAtacado(prodDiv) {
+  const precoAtacado = prodDiv.dataset.precoAtacado;
+  return precoAtacado && parseFloat(precoAtacado) > 0;
+}
+
+// ======================================================
+//  🔥 LISTA DE DESEJOS
+// ======================================================
+window.desejoComprar = function(nome){
+  if(desejos.includes(nome)){
+    mostrarNotificacao(`"${nome}" já está na lista`, 'lose');
+    return;
+  }
+
+  desejos.push(nome);
+  atualizarCarrinho();
+  mostrarNotificacao(`❤️ Desejo adicionado: ${nome}`, 'win');
+  abrirCarrinho();
+};
+
+
+// ======================================================
+//  🔥 ATUALIZA O CARRINHO VISUAL
+// ======================================================
+function atualizarCarrinho(){
+  listaCarrinho.innerHTML = '';
+  let total = 0;
+  let economiaTotal = 0;
+
+  carrinho.forEach((p, i) => {
+    const li = document.createElement('li');
+    li.className = 'item-carrinho';
+    const subtotal = (p.valor * p.qtd).toFixed(2);
+    
+    const economiaItem = p.tipoPreco === 'atacado' ? 
+        ((p.precoVarejo - p.valor) * p.qtd) : 0;
+    economiaTotal += economiaItem;
+    
+    let tipoPrecoHtml = '';
+    if(p.tipoPreco === 'atacado'){
+      tipoPrecoHtml = '<span class="badge-atacado">🏷️ ATACADO</span>';
+    }
+    
+    li.innerHTML = `
+      <div class="item-info">
+        <strong class="item-title">${p.descricao}</strong>
+        ${tipoPrecoHtml}
+        <div class="item-meta">
+          x${p.qtd} • 
+          ${p.tipoPreco === 'atacado' ? 
+            `<span style="text-decoration: line-through; color: #999;">R$ ${p.precoVarejo.toFixed(2)}</span> ` : ''}
+          <strong>R$ ${p.valor.toFixed(2)}</strong> cada
+        </div>
+        <div class="item-sub">Subtotal: R$ ${subtotal}</div>
+        ${economiaItem > 0 ? 
+          `<div class="item-economia">💰 Economia: R$ ${economiaItem.toFixed(2)}</div>` : ''}
+      </div>
+      <div class="item-actions">
+        <button type="button" aria-label="Remover item ${p.descricao}" onclick="removerCarrinho(${i})">
+          <i class="fas fa-trash-alt"></i>
+        </button>
+      </div>
+    `;
+    listaCarrinho.appendChild(li);
+    total += (p.valor * p.qtd);
+  });
+
+  desejos.forEach((d, i) => {
+    const li = document.createElement('li');
+    li.className = 'item-carrinho desejo';
+    li.innerHTML = `
+      <div class="item-info">
+        <strong class="item-title">⭐ Desejo futuro</strong>
+        <div class="item-meta">${d}</div>
+      </div>
+      <div class="item-actions">
+        <button type="button" aria-label="Remover desejo ${d}" onclick="removerDesejo(${i})">
+          <i class="fas fa-trash-alt"></i>
+        </button>
+      </div>
+    `;
+    listaCarrinho.appendChild(li);
+  });
+  
+  if(carrinho.length === 0 && desejos.length === 0){
+    const li = document.createElement('li');
+    li.innerHTML = 'Seu carrinho e lista de desejos estão vazios. Adicione algo! 💄';
+    li.style.textAlign = 'center';
+    li.style.padding = '20px 0';
+    li.style.color = '#777';
+    listaCarrinho.appendChild(li);
+    enviarWhats.disabled = true;
+  } else {
+    enviarWhats.disabled = false;
+  }
+
+  totalCarrinho.innerHTML = `
+    <span>Total:</span> 
+    <strong>R$ ${total.toFixed(2)}</strong>
+    ${economiaTotal > 0 ? 
+      `<br><span style="color: #27ae60; font-size: 0.9rem;">💰 Você economizou R$ ${economiaTotal.toFixed(2)} no atacado!</span>` : ''}
+  `;
+  
+  atualizarContadorCarrinho();
+}
+
+
+// ---------- REMOÇÕES ----------
+window.removerCarrinho = function(index){
+  if(carrinho[index]){
+    const nome = carrinho[index].descricao;
+    const id = carrinho[index].id;
+    carrinho.splice(index, 1);
+    
+    // Atualizar info de atacado no card se necessário
+    const prodDiv = document.querySelector(`[data-id="${id}"]`);
+    if(prodDiv && temAtacado(prodDiv)){
+      const existente = carrinho.find(p => p.id === id);
+      if(existente){
+        atualizarInfoAtacado(id, existente.qtd);
+      } else {
+        const infoDiv = document.getElementById(`info-atacado-${id}`);
+        if(infoDiv) infoDiv.style.display = 'none';
+      }
+    }
+    
+    atualizarCarrinho();
+    mostrarNotificacao(`❌ ${nome} removido`, "lose");
+  }
+};
+
+window.removerDesejo = function(index){
+  if(desejos[index]){
+    const nome = desejos[index];
+    desejos.splice(index, 1);
+    atualizarCarrinho();
+    mostrarNotificacao(`❌ Desejo removido: ${nome}`, "lose");
+  }
+};
+
+// ---------- FINALIZAR (WHATSAPP) ----------
+enviarWhats.addEventListener('click', (e) => {
+  e.preventDefault();
+  e.stopPropagation();
+
+  if(carrinho.length === 0 && desejos.length === 0){
+    mostrarNotificacao('Seu carrinho está vazio!', 'lose');
+    return;
+  }
+
+  let msg = "*👋🏻 Olá, GK Premium! Gostaria de fazer um pedido:*\n\n";
+  let economiaTotal = 0;
+
+  if(carrinho.length > 0){
+    msg += "*📦 ITENS PARA COMPRA:*\n";
+    carrinho.forEach(p => {
+      const economiaItem = p.tipoPreco === 'atacado' ? 
+          ((p.precoVarejo - p.valor) * p.qtd) : 0;
+      economiaTotal += economiaItem;
+      
+      msg += `> *${p.descricao}* x${p.qtd}\n`;
+      msg += `  └ Preço unitário: R$ ${p.valor.toFixed(2)}`;
+      
+      if(p.tipoPreco === 'atacado'){
+        msg += ` (ATACADO - de R$ ${p.precoVarejo.toFixed(2)})`;
+      }
+      msg += `\n`;
+      msg += `  └ Subtotal: R$ ${(p.valor * p.qtd).toFixed(2)}\n`;
+      
+      if(economiaItem > 0){
+        msg += `  └ 💰 Economia: R$ ${economiaItem.toFixed(2)}\n`;
+      }
+    });
+    msg += "\n";
+  }
+  
+  if(desejos.length > 0){
+    msg += "*❤️ DESEJOS FUTUROS:*\n";
+    desejos.forEach(d => msg += `- ${d}\n`);
+    msg += "\n";
+  }
+
+  const total = carrinho.reduce((acc, p) => acc + (p.valor * p.qtd), 0);
+  msg += `*💰 TOTAL DO PEDIDO:* R$ ${total.toFixed(2)}\n`;
+  
+  if(economiaTotal > 0){
+    msg += `*🎉 ECONOMIA NO ATACADO:* R$ ${economiaTotal.toFixed(2)}\n\n`;
+  }
+  
+  msg += "_Aguardando a confirmação do pedido e forma de pagamento._";
+
+  const numero = "559285341621";
+  const url = `https://api.whatsapp.com/send?phone=${numero}&text=${encodeURIComponent(msg)}`;
+
+  try {
+    window.open(url, '_blank', 'noopener,noreferrer');
+    mostrarNotificacao('Redirecionando para o WhatsApp...', 'win');
+  } catch (err) {
+    window.location.href = url;
   }
 });
 
-if (process.env.NODE_ENV !== 'production') {
-  const PORT = process.env.PORT || 3000;
-  app.listen(PORT, () => console.log(`🚀 Máscara rodando na porta ${PORT}`));
+// ---------- PESQUISA E FILTROS ----------
+function aplicarFiltros(){
+  const filtroTexto = (pesquisaInput.value || '').toLowerCase().trim();
+
+  produtosContainer.querySelectorAll('.produto').forEach(prod => {
+    const nome = (prod.dataset.nome || '').toLowerCase();
+    const estoque = parseInt(prod.dataset.estoque) || 0;
+    const temPrecoAtacado = temAtacado(prod);
+
+    let mostrar = nome.includes(filtroTexto);
+
+    if(filtroAtual === 'disponivel' && estoque <= 0) mostrar = false;
+    if(filtroAtual === 'esgotado' && estoque > 0) mostrar = false;
+    if(filtroAtual === 'acessorio' && !nome.includes('acessorio')) mostrar = false;
+    if(filtroAtual === 'roupas-masculinas' && !nome.includes('roupas masculina')) mostrar = false;
+    if(filtroAtual === 'roupas-femininas' && !nome.includes('roupas feminina')) mostrar = false;
+    
+    // NOVO FILTRO: Atacado
+    if(filtroAtual === 'atacado' && !temPrecoAtacado) mostrar = false;
+
+    if(filtroAtual === 'novos'){
+      const idsOrdenados = [...produtosContainer.querySelectorAll('.produto')]
+        .map(p => parseInt(p.dataset.id) || 0)
+        .sort((a, b) => b - a)
+        .slice(0, 10);
+      const id = parseInt(prod.dataset.id) || 0;
+      if(!idsOrdenados.includes(id)) mostrar = false;
+    }
+
+    prod.style.display = mostrar ? 'flex' : 'none';
+  });
+}
+pesquisaInput.addEventListener('input', aplicarFiltros);
+
+// ---------- ORGANIZAR PRODUTOS ----------
+document.addEventListener("DOMContentLoaded", () => {
+  const container = document.getElementById("produtos");
+  let itens = Array.from(container.children);
+
+  itens.forEach(div => {
+    div.__vendidos = parseInt(div.dataset.vendido || "0");
+  });
+
+  const ordenados = [...itens].sort((a, b) => b.__vendidos - a.__vendidos);
+  const top3 = ordenados.filter(item => item.__vendidos > 0).slice(0, 3);
+  const resto = ordenados.slice(top3.length).sort(() => Math.random() - 0.5);
+
+  container.innerHTML = "";
+  top3.forEach(item => container.appendChild(item));
+  resto.forEach(item => container.appendChild(item));
+
+  // Inicializar listeners para inputs de quantidade
+  itens.forEach(item => {
+    const id = item.dataset.id;
+    const input = document.getElementById(`qtd-${id}`);
+    if(input && temAtacado(item)){
+      input.addEventListener('input', (e) => {
+        const qtd = parseInt(e.target.value) || 0;
+        atualizarInfoAtacado(id, qtd);
+      });
+    }
+  });
+
+  atualizarCarrinho();
+  aplicarFiltros();
+});
+</script>
+
+<script>
+// ======== PLAYER DE MÚSICA ========
+const widgetToggle = document.getElementById("widget-toggle");
+const musicToggle  = document.getElementById("music-toggle");
+const closeBtn     = document.getElementById("music-close");
+const widget       = document.getElementById("music-widget");
+const audio        = document.getElementById("audio");
+const bar          = document.getElementById("progress-bar");
+const progressContainer = document.getElementById("progress-container");
+const progressText = document.getElementById("progress-text");
+const progressPath = document.getElementById("progress-path");
+const loadingMessage = document.getElementById("loading-message");
+const queryInput  = document.getElementById("query");
+const searchBtn   = document.getElementById("search-btn");
+const content     = document.getElementById("music-content");
+const status      = document.getElementById("status-message");
+const titleEl     = document.getElementById("song-title");
+const thumbEl     = document.getElementById("song-thumb");
+const durationEl  = document.getElementById("audio-duration");
+const currentTimeEl = document.getElementById("current-time");
+const equalizer   = document.getElementById("equalizer");
+const progressBarContainer = document.getElementById("progress-bar-container");
+
+const loadingMessages = [
+    "🎧 Sintonizando as frequências...",
+    "🎶 Analisando a batida e o ritmo...",
+    "📡 Conectando com o servidor de áudio...",
+    "✨ Quase lá! Preparando a melhor qualidade...",
+];
+
+function formatTime(seconds) {
+    if (!isFinite(seconds) || seconds < 0) return "0:00";
+    const min = Math.floor(seconds / 60);
+    const sec = Math.floor(seconds % 60);
+    return min + ":" + ("0" + sec).slice(-2);
 }
 
-export default app;
+function showNotification(message, type = "success") {
+    const notif = document.getElementById("music-notif");
+    notif.textContent = message;
+    notif.className = "notif show " + type;
+    setTimeout(() => { notif.className = "notif hidden"; }, 3500);
+}
 
+audio.addEventListener("play", () => {
+    equalizer.classList.remove("hidden");
+    musicToggle.textContent = "⏸️";
+});
 
-    
+audio.addEventListener("pause", () => {
+    equalizer.classList.add("hidden");
+    musicToggle.textContent = "▶️";
+});
+
+audio.addEventListener("ended", () => {
+    bar.style.width = "0%";
+    currentTimeEl.textContent = "0:00";
+    equalizer.classList.add("hidden");
+    musicToggle.textContent = "▶️";
+});
+
+audio.addEventListener("loadedmetadata", () => {
+    durationEl.textContent = formatTime(audio.duration);
+});
+
+audio.addEventListener("timeupdate", () => {
+    if (!audio.duration) return;
+    const progressPercent = (audio.currentTime / audio.duration) * 100;
+    bar.style.width = progressPercent + "%";
+    currentTimeEl.textContent = formatTime(audio.currentTime);
+});
+
+progressBarContainer.onclick = (e) => {
+    if (!audio.duration) return;
+    const rect = progressBarContainer.getBoundingClientRect();
+    const percent = (e.clientX - rect.left) / rect.width;
+    audio.currentTime = audio.duration * percent;
+};
+
+function setSuggestion(song) {
+    queryInput.value = song;
+    playMusic();
+}
+
+widgetToggle.onclick = () => {
+    widget.classList.toggle("hidden");
+};
+
+musicToggle.onclick = () => {
+    if (!audio.src) {
+        showNotification("Nenhuma música carregada ainda!", "error");
+        return;
+    }
+    audio.paused ? audio.play() : audio.pause();
+};
+
+let progressAnimation;
+let progressValue = 0;
+
+function startProgressAnimation() {
+    progressContainer.classList.remove("hidden");
+    status.classList.add("hidden");
+    progressValue = 0;
+
+    let messageIndex = 0;
+    loadingMessage.textContent = loadingMessages[0];
+
+    progressAnimation = setInterval(() => {
+        progressValue += Math.random() * 1.5 + 0.5;
+        if (progressValue >= 98) progressValue = 98;
+
+        const floorPercent = Math.floor(progressValue);
+        progressText.textContent = floorPercent + "%";
+        progressPath.setAttribute("stroke-dasharray", `${floorPercent}, 100`);
+
+        if (floorPercent > 10 + messageIndex * 20 && messageIndex < loadingMessages.length - 1) {
+            messageIndex++;
+            loadingMessage.textContent = loadingMessages[messageIndex];
+        }
+    }, 100);
+}
+
+function stopProgressAnimation() {
+    clearInterval(progressAnimation);
+    progressText.textContent = "100%";
+    progressPath.setAttribute("stroke-dasharray", "100, 100");
+
+    setTimeout(() => {
+        progressContainer.classList.add("hidden");
+        status.classList.remove("hidden");
+        progressPath.setAttribute("stroke-dasharray", "0, 100");
+    }, 300);
+}
+
+searchBtn.onclick = playMusic;
+
+async function playMusic() {
+    const q = queryInput.value.trim();
+    if (!q) {
+        showNotification("⚠️ Digite o nome da música!", "error");
+        return queryInput.focus();
+    }
+
+    content.classList.add("hidden");
+    audio.pause();
+
+    searchBtn.disabled = true;
+    searchBtn.classList.add("loading");
+    startProgressAnimation();
+
+    try {
+        const res = await fetch("/play", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ query: q, userId: "site", User: "site" })
+        });
+
+        const data = await res.json();
+
+        searchBtn.disabled = false;
+        searchBtn.classList.remove("loading");
+        stopProgressAnimation();
+
+        if (!data.download) {
+            status.textContent = `❌ "${q}" não foi encontrada.`;
+            showNotification("Música não encontrada!", "error");
+            return;
+        }
+
+        titleEl.textContent = data.title;
+        thumbEl.src = data.thumb;
+        audio.src = data.download;
+
+        const dl = document.getElementById("btn-download");
+        dl.href = data.download;
+        dl.download = data.title + ".mp3";
+
+        audio.onloadeddata = () => {
+            content.classList.remove("hidden");
+            status.textContent = "🎶 Vibe pronta para tocar!";
+            showNotification(`🎵 ${data.title} carregada!`, "success");
+            audio.play();
+        };
+
+    } catch (e) {
+        console.error(e);
+        stopProgressAnimation();
+        searchBtn.disabled = false;
+        searchBtn.classList.remove("loading");
+        status.textContent = "❌ Erro ao buscar música.";
+        showNotification("Erro de conexão!", "error");
+    }
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  const closeBtn = document.getElementById("music-close");
+  const widget = document.getElementById("music-widget");
+
+  if (closeBtn && widget) {
+    closeBtn.onclick = () => {
+      widget.classList.add("hidden");
+    };
+  }
+});
+</script>
+
+</body>
+</html>
+
